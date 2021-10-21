@@ -103,7 +103,8 @@ a {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center; }
+  align-items: center;
+  z-index: 1; }
   .sidepanel__text {
     width: 120px;
     height: 120px;
@@ -122,6 +123,7 @@ a {
       width: 100%; }
 
 .preview {
+  display: flex;
   padding: 28px 0 100px 0;
   position: relative; }
   .preview__life {
@@ -529,3 +531,8 @@ a {
     display: block;
     width: 280px;
     margin: 0 auto; }
+  .modal_show {
+    display: block; }
+
+.test {
+  display: flex; }
