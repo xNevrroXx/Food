@@ -105,16 +105,14 @@ window.addEventListener("DOMContentLoaded", () => {
   }); // countdown(обратный отсчет времени)
 
   const endDatePromotion = '2021-10-31';
-  initCountdown(".promotion__timer", endDatePromotion);
-  window.addEventListener('wheel', e => {
-    console.log(window.event || e);
-  }); // modal
+  initCountdown(".promotion__timer", endDatePromotion); // modal
 
   const modal = document.querySelector(".modal"),
         modalShowElems = document.querySelectorAll("[data-modal-show]"),
-        modalCloseElems = document.querySelectorAll("[data-modal-close]");
+        modalCloseElems = document.querySelectorAll("[data-modal-close]"),
+        modalTimerId = setTimeout(openModal, 5000);
   modalShowElems.forEach(showElemBtn => {
-    showElemBtn.addEventListener("click", showModal);
+    showElemBtn.addEventListener("click", openModal);
   });
   modalCloseElems.forEach(closeElemBtn => {
     closeElemBtn.addEventListener("click", closeModal);
@@ -128,7 +126,47 @@ window.addEventListener("DOMContentLoaded", () => {
     if (e.code == "Escape" && modal.classList.contains("modal_show")) {
       closeModal();
     }
-  }); //////////////////////////////////////////////////////////	
+  });
+  window.addEventListener("scroll", showModalByScroll);
+
+  function showModalByScroll() {
+    if (window.pageYOffset + document.documentElement.clientHeight == document.documentElement.scrollHeight) {
+      openModal();
+      window.removeEventListener("scroll", showModalByScroll);
+    }
+  } // dynamic layout menu card
+
+
+  const wrapperMenuCards = document.querySelector(".menu__field > .container");
+
+  class MenuForTheDayCard {
+    constructor(urlToImageMenu, subtitleMenu, descriptionMenu, priceAtDay) {
+      this.urlToImageMenu = urlToImageMenu;
+      this.subtitleMenu = subtitleMenu;
+      this.menuDescription = descriptionMenu;
+      this.priceAtDay = priceAtDay;
+      this.innerHtml = `
+			<div class="menu__item">
+				<img src="${urlToImageMenu}" alt="post">
+				<h3 class="menu__item-subtitle">${subtitleMenu}</h3>
+				<div class="menu__item-descr">${descriptionMenu}</div>
+				<div class="menu__item-divider"></div>
+				<div class="menu__item-price">
+					<div class="menu__item-cost">Цена:</div>
+					<div class="menu__item-total"><span>${priceAtDay}</span> грн/день</div>
+				</div>
+			</div>
+		`;
+    }
+
+  }
+
+  const fitnessMenuCard = new MenuForTheDayCard(`img/tabs/vegy.jpg`, `Меню "Фитнес"`, `Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!`, 229);
+  const premiumMenuCard = new MenuForTheDayCard(`img/tabs/elite.jpg`, `Меню “Премиум”`, `В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!`, 550);
+  const lentenMenuCard = new MenuForTheDayCard(`img/tabs/post.jpg`, `Меню "Постное"`, `Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.`, 430);
+  wrapperMenuCards.insertAdjacentHTML("beforeend", fitnessMenuCard.innerHtml);
+  wrapperMenuCards.insertAdjacentHTML("beforeend", premiumMenuCard.innerHtml);
+  wrapperMenuCards.insertAdjacentHTML("beforeend", lentenMenuCard.innerHtml); //////////////////////////////////////////////////////////	
   // проскроллен ли элемент до полной видимости
   // const previewBlock = document.querySelector(".tabcontent");
   // window.addEventListener('wheel', (e) => {
@@ -257,9 +295,10 @@ window.addEventListener("DOMContentLoaded", () => {
   } // for modal
 
 
-  function showModal() {
+  function openModal() {
     modal.classList.add("modal_show");
     document.body.style.overflow = "hidden";
+    clearInterval(modalTimerId);
   }
 
   function closeModal() {
