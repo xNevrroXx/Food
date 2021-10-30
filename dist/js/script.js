@@ -105,42 +105,12 @@ window.addEventListener("DOMContentLoaded", () => {
   }); // countdown(обратный отсчет времени)
 
   const endDatePromotion = '2021-10-31';
-  initCountdown(".promotion__timer", endDatePromotion); // modal
-
-  const modal = document.querySelector(".modal"),
-        modalShowElems = document.querySelectorAll("[data-modal-show]"),
-        modalCloseElems = document.querySelectorAll("[data-modal-close]"),
-        modalTimerId = setTimeout(openModal, 5000);
-  modalShowElems.forEach(showElemBtn => {
-    showElemBtn.addEventListener("click", openModal);
-  });
-  modalCloseElems.forEach(closeElemBtn => {
-    closeElemBtn.addEventListener("click", closeModal);
-  });
-  modal.addEventListener("click", e => {
-    if (e.target == modal) {
-      closeModal();
-    }
-  });
-  document.addEventListener("keydown", e => {
-    if (e.code == "Escape" && modal.classList.contains("modal_show")) {
-      closeModal();
-    }
-  });
-  window.addEventListener("scroll", showModalByScroll);
-
-  function showModalByScroll() {
-    if (window.pageYOffset + document.documentElement.clientHeight == document.documentElement.scrollHeight) {
-      openModal();
-      window.removeEventListener("scroll", showModalByScroll);
-    }
-  } // dynamic layout menu card
-
+  initCountdown(".promotion__timer", endDatePromotion); // dynamic layout menu card
 
   const wrapperMenuCards = document.querySelector(".menu__field > .container");
 
   class MenuForTheDayCard {
-    constructor(urlToImageMenu, subtitleMenu, descriptionMenu, priceAtDay) {
+    constructor(urlToImageMenu, subtitleMenu, descriptionMenu, priceAtDay, ...modificationsClasses) {
       this.urlToImageMenu = urlToImageMenu;
       this.subtitleMenu = subtitleMenu;
       this.menuDescription = descriptionMenu;
@@ -166,7 +136,115 @@ window.addEventListener("DOMContentLoaded", () => {
   const lentenMenuCard = new MenuForTheDayCard(`img/tabs/post.jpg`, `Меню "Постное"`, `Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.`, 430);
   wrapperMenuCards.insertAdjacentHTML("beforeend", fitnessMenuCard.innerHtml);
   wrapperMenuCards.insertAdjacentHTML("beforeend", premiumMenuCard.innerHtml);
-  wrapperMenuCards.insertAdjacentHTML("beforeend", lentenMenuCard.innerHtml); //////////////////////////////////////////////////////////	
+  wrapperMenuCards.insertAdjacentHTML("beforeend", lentenMenuCard.innerHtml); // modal
+
+  const modal = document.querySelector(".modal"),
+        modalShowElems = document.querySelectorAll("[data-modal-show]"),
+        modalTimerId = setTimeout(openModal, 20000);
+  let booleanOpenThanksModal = false;
+  modalShowElems.forEach(showElemBtn => {
+    showElemBtn.addEventListener("click", openModal);
+  });
+  document.addEventListener("click", e => {
+    if (e.target == document.querySelector(".modal_show") || e.target.getAttribute("data-modal-close") == "") {
+      closeModal();
+    }
+  });
+  document.addEventListener("keydown", e => {
+    if (e.code == "Escape") {
+      closeModal();
+    }
+  });
+  window.addEventListener("scroll", showModalByScroll);
+
+  function showModalByScroll() {
+    if (window.scrollY + document.documentElement.clientHeight == document.documentElement.scrollHeight) {
+      openModal();
+      window.removeEventListener("scroll", showModalByScroll);
+    }
+  } // forms
+
+
+  const forms = document.querySelectorAll("form"),
+        messages = {
+    loading: "icons/spinner.svg",
+    success: "Спасибо! Мы скоро с Вами свяжемся",
+    failure: "Что-то пошло не так..."
+  };
+  forms.forEach(form => {
+    postData(form);
+  });
+
+  function postData(form) {
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const loadingSpinner = document.createElement("img");
+      loadingSpinner.src = messages.loading;
+      loadingSpinner.style.cssText = `
+				display: block;
+				margin: 0 auto;
+			`;
+      form.insertAdjacentElement("afterend", loadingSpinner);
+      const formData = new FormData(form),
+            object = {};
+      formData.forEach((value, key) => {
+        object[key] = value;
+      });
+      const json = JSON.stringify(object);
+      fetch('server.php', {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json"
+        },
+        body: json
+      }).then(data => data.text()).then(data => {
+        console.log(data);
+        loadingSpinner.remove();
+        form.reset();
+
+        if (modal.classList.contains("modal_show")) {
+          closeModal();
+        }
+
+        showThanksModal(messages.success);
+      }).catch(() => {
+        showThanksModal(messages.failure);
+      });
+    });
+  }
+
+  function showThanksModal(str) {
+    const modalThanks = document.createElement("div");
+    modalThanks.classList.add("modal", "modal_show");
+    modalThanks.innerHTML = `
+			<div class="modal__dialog">
+				<div class="modal__content">
+					<div data-modal-close class="modal__close">&times;</div>
+					<div class="modal__title">${str}</div>
+				</div>
+			</div>
+		`;
+    modal.insertAdjacentElement("afterend", modalThanks);
+    document.body.style.overflow = "hidden";
+    const timerIdCloseThanksModal = setTimeout(closeThanksModal, 4000);
+
+    function closeThanksModal() {
+      if (booleanOpenThanksModal) {
+        closeModal();
+      } else {
+        clearInterval(timerIdCloseThanksModal);
+      }
+    }
+  } // fetch('https://jsonplaceholder.typicode.com/posts', {
+  // 	method: "POST",
+  // 	body: JSON.stringify({name: "Alex", surname: "Peterson"}),
+  // 	headers: {
+  // 		"Content-type": "application/json"
+  // 	}
+  // })
+  // 	.then(response => response.json())
+  // 	.then(json => console.log(json));
+  //////////////////////////////////////////////////////////	
   // проскроллен ли элемент до полной видимости
   // const previewBlock = document.querySelector(".tabcontent");
   // window.addEventListener('wheel', (e) => {
@@ -196,6 +274,7 @@ window.addEventListener("DOMContentLoaded", () => {
   // })();
   /////////* functions */////////
   // for Tabs
+
 
   function toggleTabContent(clickedElement) {
     if (clickedElement && clickedElement.classList.contains("tabheader__item") && !clickedElement.classList.contains("tabheader__item_active")) {
@@ -302,7 +381,10 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function closeModal() {
-    modal.classList.remove("modal_show");
+    document.querySelectorAll(".modal").forEach(modal => {
+      modal.classList.remove("modal_show");
+    });
+    booleanOpenThanksModal = false;
     document.body.style.overflow = "";
   }
 });

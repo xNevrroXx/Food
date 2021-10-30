@@ -1,56 +1,27 @@
 window.addEventListener("DOMContentLoaded", () => {
 	// tabs
-	const tabs		  = document.querySelectorAll(".tabheader__item"),
-		  tabsParent  = document.querySelector(".tabheader__items"),
-		  tabsContent = document.querySelectorAll(".tabcontent");
+	const tabs = document.querySelectorAll(".tabheader__item"),
+		tabsParent = document.querySelector(".tabheader__items"),
+		tabsContent = document.querySelectorAll(".tabcontent");
 
-		
+
 	setTabsIndex();
 	tabsParent.addEventListener("click", (event) => {
 		const clickedElement = event.target;
 		toggleTabContent(clickedElement);
 	});
 
+
 	// countdown(обратный отсчет времени)
 	const endDatePromotion = '2021-10-31';
 	initCountdown(".promotion__timer", endDatePromotion);
 
-	// modal
-	const modal = document.querySelector(".modal"),
-		  modalShowElems = document.querySelectorAll("[data-modal-show]"),
-		  modalCloseElems = document.querySelectorAll("[data-modal-close]"),
-		  modalTimerId = setTimeout(openModal, 5000);
-
-	modalShowElems.forEach(showElemBtn => {
-		showElemBtn.addEventListener("click", openModal);
-	});
-	modalCloseElems.forEach(closeElemBtn => {
-		closeElemBtn.addEventListener("click", closeModal);
-	});
-	modal.addEventListener("click", (e) => {
-		if(e.target == modal) {
-			closeModal();
-		}
-	});
-	document.addEventListener("keydown", (e) => {
-		if(e.code == "Escape" && modal.classList.contains("modal_show")) {
-			closeModal();
-		}
-	});
-	window.addEventListener("scroll", showModalByScroll);
-
-	function showModalByScroll() {
-		if(window.pageYOffset + document.documentElement.clientHeight == document.documentElement.scrollHeight) {
-			openModal();
-			window.removeEventListener("scroll", showModalByScroll);
-		}
-	}
 
 	// dynamic layout menu card
 	const wrapperMenuCards = document.querySelector(".menu__field > .container");
 
 	class MenuForTheDayCard {
-		constructor(urlToImageMenu, subtitleMenu, descriptionMenu, priceAtDay) {
+		constructor(urlToImageMenu, subtitleMenu, descriptionMenu, priceAtDay, ...modificationsClasses) {
 			this.urlToImageMenu = urlToImageMenu;
 			this.subtitleMenu = subtitleMenu;
 			this.menuDescription = descriptionMenu;
@@ -91,22 +62,143 @@ window.addEventListener("DOMContentLoaded", () => {
 	wrapperMenuCards.insertAdjacentHTML("beforeend", fitnessMenuCard.innerHtml);
 	wrapperMenuCards.insertAdjacentHTML("beforeend", premiumMenuCard.innerHtml);
 	wrapperMenuCards.insertAdjacentHTML("beforeend", lentenMenuCard.innerHtml);
-		  
+
+	
+	// modal
+	const modal = document.querySelector(".modal"),
+		modalShowElems = document.querySelectorAll("[data-modal-show]"),
+		modalTimerId = setTimeout(openModal, 20000);
+		
+	let booleanOpenThanksModal = false;
+
+	modalShowElems.forEach(showElemBtn => {
+		showElemBtn.addEventListener("click", openModal);
+	});
+
+	document.addEventListener("click", (e) => {
+		if (e.target == document.querySelector(".modal_show") 
+			|| 
+			e.target.getAttribute("data-modal-close") == "") {
+			closeModal();
+		}
+	});
+
+	document.addEventListener("keydown", (e) => {
+		if ( e.code == "Escape") {
+			closeModal();
+		}
+	});
+	window.addEventListener("scroll", showModalByScroll);
+
+	function showModalByScroll() {
+		if (window.scrollY + document.documentElement.clientHeight == document.documentElement.scrollHeight) {
+			openModal();
+			window.removeEventListener("scroll", showModalByScroll);
+		}
+	}
 
 
+	// forms
+	const forms = document.querySelectorAll("form"),
+		  messages = {
+			loading: "icons/spinner.svg",
+			success: "Спасибо! Мы скоро с Вами свяжемся",
+			failure: "Что-то пошло не так..."
+		  };
 
+	forms.forEach(form => {
+		postData(form);
+	});	
 
-//////////////////////////////////////////////////////////	
+	function postData(form) {
+		form.addEventListener("submit", e => {
+			e.preventDefault();
+
+			const loadingSpinner = document.createElement("img");
+			loadingSpinner.src = messages.loading;
+			loadingSpinner.style.cssText = `
+				display: block;
+				margin: 0 auto;
+			`;
+			form.insertAdjacentElement("afterend", loadingSpinner);
+
+			const formData = new FormData(form),
+				  object   = {};
+			
+			formData.forEach((value, key) => {
+				object[key] = value;
+			});
+			const json = JSON.stringify(object);
+
+			fetch('server.php', {
+				method: "POST",
+				headers: {
+					"Content-type": "application/json"
+				},
+				body: json
+			})
+			.then( data => data.text())
+			.then( data => {
+				console.log(data);
+				loadingSpinner.remove();
+				form.reset();
+				if(modal.classList.contains("modal_show")) {
+					closeModal();
+				}
+				showThanksModal(messages.success);
+			})
+			.catch( () => {
+				showThanksModal(messages.failure);
+			});
+		});
+	}
+
+	function showThanksModal(str) {
+		const modalThanks = document.createElement("div");
+		modalThanks.classList.add("modal", "modal_show");
+		modalThanks.innerHTML = `
+			<div class="modal__dialog">
+				<div class="modal__content">
+					<div data-modal-close class="modal__close">&times;</div>
+					<div class="modal__title">${str}</div>
+				</div>
+			</div>
+		`;
+		modal.insertAdjacentElement("afterend", modalThanks);
+		document.body.style.overflow = "hidden";
+
+		const timerIdCloseThanksModal = setTimeout( closeThanksModal, 4000);
+
+		function closeThanksModal() {
+			if(booleanOpenThanksModal) {
+				closeModal();
+			} else {
+				clearInterval(timerIdCloseThanksModal);
+			}
+		}
+	}
+
+	// fetch('https://jsonplaceholder.typicode.com/posts', {
+	// 	method: "POST",
+	// 	body: JSON.stringify({name: "Alex", surname: "Peterson"}),
+	// 	headers: {
+	// 		"Content-type": "application/json"
+	// 	}
+	// })
+	// 	.then(response => response.json())
+	// 	.then(json => console.log(json));
+
+	//////////////////////////////////////////////////////////	
 	// проскроллен ли элемент до полной видимости
 	// const previewBlock = document.querySelector(".tabcontent");
 	// window.addEventListener('wheel', (e) => {
 	// 	const posTop = previewBlock.getBoundingClientRect().top;
 	// 	e.preventDefault();
 	// 	if (posTop + previewBlock.clientHeight <= window.innerHeight && posTop > 0) {
-			
+
 	// 	}
 	// });
-//////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////
 	// test horizontal wheel - do NOT work...
 	// (function() {
 
@@ -125,22 +217,23 @@ window.addEventListener("DOMContentLoaded", () => {
 	// 		// IE 6/7/8
 	// 		document.getElementById('statistic-table').attachEvent("onmousewheel", scrollHorizontally);
 	// 	}
-	
+
 	// })();
 
-	
+
 	/////////* functions */////////
 	// for Tabs
 	function toggleTabContent(clickedElement) {
 		if (
 			clickedElement &&
 			clickedElement.classList.contains("tabheader__item") &&
-			!clickedElement.classList.contains("tabheader__item_active") 
+			!clickedElement.classList.contains("tabheader__item_active")
 		) {
 			hideTabsContent();
 			showTabsContent(clickedElement);
 		}
 	}
+
 	function hideTabsContent() {
 		tabs.forEach((tab) => {
 			tab.classList.remove("tabheader__item_active");
@@ -149,10 +242,12 @@ window.addEventListener("DOMContentLoaded", () => {
 			tabContent.classList.remove("tabcontent_active", "fade");
 		});
 	}
+
 	function showTabsContent(tab) {
 		tab.classList.add("tabheader__item_active");
 		tabsContent[tab.dataset.index].classList.add("tabcontent_active", "fade");
 	}
+
 	function setTabsIndex() { //для сопоставления таба и контента
 		tabs.forEach((tab, i) => {
 			tab.dataset.index = i;
@@ -160,38 +255,40 @@ window.addEventListener("DOMContentLoaded", () => {
 	}
 	// for Countdown Time Promotion
 	function getZero(num) {
-		if( num >= 0 && num < 10 ) {
+		if (num >= 0 && num < 10) {
 			return `0${num}`;
 		} else {
 			return num;
 		}
 	}
+
 	function initCountdown(selectorWrapperTimer, endDatePromotion) {
-		const timer 		   = document.querySelector(selectorWrapperTimer),
-			  daysBlock	 	   = document.getElementById("days"),
-			  hoursBlock   	   = document.getElementById("hours"),
-			  minutesBlock 	   = document.getElementById("minutes"),
-			  secondsBlock 	   = document.getElementById("seconds"),
-			  timeInterval	   = setInterval( updateClock, 1000 );
+		const timer = document.querySelector(selectorWrapperTimer),
+			daysBlock = document.getElementById("days"),
+			hoursBlock = document.getElementById("hours"),
+			minutesBlock = document.getElementById("minutes"),
+			secondsBlock = document.getElementById("seconds"),
+			timeInterval = setInterval(updateClock, 1000);
 
 		updateClock();
 
-		function updateClock () {
+		function updateClock() {
 			const remainderTime = getRemainderTimeObj(endDatePromotion);
 			changePromoTimeAtPage(remainderTime);
 			changeTxtContentUnderTime();
 
-			if(remainderTime.fullTimeMS <= 0) {
+			if (remainderTime.fullTimeMS <= 0) {
 				clearInterval(timeInterval);
 			}
 		}
+
 		function getRemainderTimeObj(endDatePromotionStr) {
 			const remainderTimeMS = Date.parse(endDatePromotionStr) - new Date(),
-					days  = Math.floor(remainderTimeMS / (1000*60*60*24)),
-					hours = Math.floor(remainderTimeMS / (1000*60*60) % 24),
-					minutes = Math.floor(remainderTimeMS / (1000*60) % 60),
-					seconds = Math.floor(remainderTimeMS / 1000 % 60);
-		
+				days = Math.floor(remainderTimeMS / (1000 * 60 * 60 * 24)),
+				hours = Math.floor(remainderTimeMS / (1000 * 60 * 60) % 24),
+				minutes = Math.floor(remainderTimeMS / (1000 * 60) % 60),
+				seconds = Math.floor(remainderTimeMS / 1000 % 60);
+
 			return {
 				"fullTimeMS": remainderTimeMS,
 				"days": days,
@@ -200,30 +297,32 @@ window.addEventListener("DOMContentLoaded", () => {
 				"seconds": seconds
 			};
 		}
+
 		function changePromoTimeAtPage(remainderTimeObj) {
-			daysBlock.textContent = getZero(remainderTimeObj.days); 
+			daysBlock.textContent = getZero(remainderTimeObj.days);
 			hoursBlock.textContent = getZero(remainderTimeObj.hours);
 			minutesBlock.textContent = getZero(remainderTimeObj.minutes);
 			secondsBlock.textContent = getZero(remainderTimeObj.seconds);
 		}
+
 		function changeTxtContentUnderTime() { //меняет окончания слов
 			changeEndingWord(secondsBlock.parentElement, ["секунд", "секунда", "секунды"]);
 			changeEndingWord(minutesBlock.parentElement, ["минут", "минута", "минуты"]);
 			changeEndingWord(hoursBlock.parentElement, ["часов", "час", "часа"]);
 			changeEndingWord(daysBlock.parentElement, ["дней", "день", "дня"]);
 		}
-		function changeEndingWord (elementParentNum, arrWordForms) {
-			if( elementParentNum.firstElementChild.textContent % 10 == 0 
-				||  (elementParentNum.firstElementChild.textContent >= 5 
-					&& 
+
+		function changeEndingWord(elementParentNum, arrWordForms) {
+			if (elementParentNum.firstElementChild.textContent % 10 == 0 ||
+				(elementParentNum.firstElementChild.textContent >= 5 &&
 					elementParentNum.firstElementChild.textContent <= 20)
-			  ) {
+			) {
 				elementParentNum.childNodes[2].textContent = arrWordForms[0];
-			} else if(elementParentNum.firstElementChild.textContent % 10 == 1) {
+			} else if (elementParentNum.firstElementChild.textContent % 10 == 1) {
 				elementParentNum.childNodes[2].textContent = arrWordForms[1];
-			} else if(elementParentNum.firstElementChild.textContent % 10 == 2 
-				|| elementParentNum.firstElementChild.textContent % 10 == 3
-				|| elementParentNum.firstElementChild.textContent % 10 == 4 ) {
+			} else if (elementParentNum.firstElementChild.textContent % 10 == 2 ||
+				elementParentNum.firstElementChild.textContent % 10 == 3 ||
+				elementParentNum.firstElementChild.textContent % 10 == 4) {
 				elementParentNum.childNodes[2].textContent = arrWordForms[2];
 			}
 		}
@@ -235,8 +334,12 @@ window.addEventListener("DOMContentLoaded", () => {
 		document.body.style.overflow = "hidden";
 		clearInterval(modalTimerId);
 	}
+
 	function closeModal() {
-		modal.classList.remove("modal_show");
+		document.querySelectorAll(".modal").forEach( modal => {
+			modal.classList.remove("modal_show");
+		});
+		booleanOpenThanksModal = false;
 		document.body.style.overflow = "";
 	}
 });
