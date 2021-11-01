@@ -1,6 +1,7 @@
 {
   "name": "food",
   "version": "1.0.0",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -27,15 +28,6 @@
     "webpack-stream": "^5.2.1"
   },
   "dependencies": {
-    "node-sass": "^6.0.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/xNevrroXx/FoodJsCourse.git"
-  },
-  "bugs": {
-    "url": "https://github.com/xNevrroXx/FoodJsCourse/issues"
-  },
-  "homepage": "https://github.com/xNevrroXx/FoodJsCourse#readme",
-  "description": ""
+    "json-server": "^0.17.0"
+  }
 }

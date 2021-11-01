@@ -6,7 +6,8 @@
     <title>Food</title>
     <link rel="stylesheet" href="css/style.css">
 
-    <script defer src="js/script.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js" integrity="sha512-u9akINsQsAkG9xjc1cnGF4zw5TFDwkxuc9vUp5dltDWYCSmyd0meygbvgXrlc/z7/o4a19Fb5V0OUE58J7dcyw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script defer src="js/script.js"></script>  
 </head>
 <body>
     <header class="header">
@@ -102,7 +103,8 @@
                     Мы разработали специальное меню, где учтены все нюансы правильного питания, от баланса БЖУ до их приготовления и дробления рациона.
                 </div>
             </div>
-            <div class="offer__slider">
+            <!-- <div class="offer__slider">
+                 buttons slider
                 <div class="offer__slider-counter">
                     <div class="offer__slider-prev">
                         <img src="icons/left.svg" alt="prev">
@@ -114,19 +116,33 @@
                         <img src="icons/right.svg" alt="next">
                     </div>
                 </div>
+
+                content slider
                 <div class="offer__slider-wrapper">
-                    <div class="offer__slide">
-                        <img src="img/slider/pepper.jpg" alt="pepper">
+                    inserted with js
+                </div>
+            </div> -->
+
+            <!-- слайдер с переходом -->
+            <div class="offer__slider">
+                <!-- buttons slider -->
+                <div class="offer__slider-counter">
+                    <div class="offer__slider-prev">
+                        <img src="icons/left.svg" alt="prev">
                     </div>
-                    <!-- <div class="offer__slide">
-                        <img src="img/slider/food-12.jpg" alt="food">
+                    <span id="current">03</span>
+                    /
+                    <span id="total">04</span>
+                    <div class="offer__slider-next">
+                        <img src="icons/right.svg" alt="next">
                     </div>
-                    <div class="offer__slide">
-                        <img src="img/slider/olive-oil.jpg" alt="oil">
+                </div>
+
+                <!-- content slider -->
+                <div class="offer__slider-wrapper-long">
+                    <div class="offer__slider-wrapper">
+                        <!-- inserted with js -->
                     </div>
-                    <div class="offer__slide">
-                        <img src="img/slider/paprika.jpg" alt="paprika">
-                    </div> -->
                 </div>
             </div>
         </div>

@@ -13,10 +13,10 @@ gulp.task("copy-html", () => {
                 .pipe(gulp.dest(dist))
                 .pipe(browsersync.stream());
 });
-gulp.task("copy-php", () => {
-  return gulp.src("./src/server.php")
-              .pipe(gulp.dest(dist))
-              .pipe(browsersync.stream());
+gulp.task("copy-json", () => { 
+  return gulp.src("./src/js/*.json")
+.pipe(gulp.dest(dist + "/js"))
+.pipe(browsersync.stream());
 });
 
 gulp.task("build-js", () => {
@@ -37,7 +37,7 @@ gulp.task("build-js", () => {
                               loader: 'babel-loader',
                               options: {
                                 presets: [['@babel/preset-env', {
-                                    debug: false,
+                                    debug: true,
                                     corejs: 3,
                                     useBuiltIns: "usage"
                                 }]]
@@ -79,10 +79,10 @@ gulp.task("watch", () => {
     gulp.watch("./src/img/**/*.*", gulp.parallel("copy-assets"));
     gulp.watch("./src/scss/**/*.scss", gulp.parallel("build-sass"));
     gulp.watch("./src/js/**/*.js", gulp.parallel("build-js"));
-    gulp.watch("./src/server.php", gulp.parallel("copy-php"));
+    gulp.watch("./src/js/*.json", gulp.parallel("copy-json"));
 });
 
-gulp.task("build", gulp.parallel("copy-html", "copy-assets", "build-sass", "build-js", "copy-php"));
+gulp.task("build", gulp.parallel("copy-html", "copy-assets", "build-sass", "build-js", "copy-html", "copy-json"));
 
 gulp.task("prod", () => {
     gulp.src("./src/index.html")
@@ -91,8 +91,7 @@ gulp.task("prod", () => {
         .pipe(gulp.dest(dist + "/img"));
     gulp.src("./src/icons/**/*.*")
         .pipe(gulp.dest(dist + "/icons"));
-    gulp.src("./src/server.php")
-        .pipe(gulp.dest(dist));
+
     gulp.src("./src/js/main.js")
         .pipe(webpack({
             mode: 'production',

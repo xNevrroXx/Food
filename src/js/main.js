@@ -1,11 +1,12 @@
+'use strict';
+
 window.addEventListener("DOMContentLoaded", () => {
 	// tabs
 	const tabs = document.querySelectorAll(".tabheader__item"),
 		tabsParent = document.querySelector(".tabheader__items"),
 		tabsContent = document.querySelectorAll(".tabcontent");
 
-
-	setTabsIndex();
+	setIndexes(tabs);
 	tabsParent.addEventListener("click", (event) => {
 		const clickedElement = event.target;
 		toggleTabContent(clickedElement);
@@ -13,7 +14,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
 	// countdown(обратный отсчет времени)
-	const endDatePromotion = '2021-10-31';
+	const endDatePromotion = '2022-01-01';
 	initCountdown(".promotion__timer", endDatePromotion);
 
 
@@ -21,47 +22,107 @@ window.addEventListener("DOMContentLoaded", () => {
 	const wrapperMenuCards = document.querySelector(".menu__field > .container");
 
 	class MenuForTheDayCard {
-		constructor(urlToImageMenu, subtitleMenu, descriptionMenu, priceAtDay, ...modificationsClasses) {
+		constructor(urlToImageMenu, altimg, subtitleMenu, descriptionMenu, priceAtDay, ...modificationsClasses) {
 			this.urlToImageMenu = urlToImageMenu;
+			this.altimg = altimg;
 			this.subtitleMenu = subtitleMenu;
 			this.menuDescription = descriptionMenu;
 			this.priceAtDay = priceAtDay;
 			this.innerHtml = `
 			<div class="menu__item">
-				<img src="${urlToImageMenu}" alt="post">
+				<img src="${urlToImageMenu}" alt="${altimg}">
 				<h3 class="menu__item-subtitle">${subtitleMenu}</h3>
 				<div class="menu__item-descr">${descriptionMenu}</div>
 				<div class="menu__item-divider"></div>
 				<div class="menu__item-price">
 					<div class="menu__item-cost">Цена:</div>
-					<div class="menu__item-total"><span>${priceAtDay}</span> грн/день</div>
+					<div class="menu__item-total"><span>${priceAtDay}</span> руб/день</div>
 				</div>
 			</div>
 		`;
 		}
 	}
 
-	const fitnessMenuCard = new MenuForTheDayCard(
-		`img/tabs/vegy.jpg`,
-		`Меню "Фитнес"`,
-		`Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!`,
-		229
-	);
-	const premiumMenuCard = new MenuForTheDayCard(
-		`img/tabs/elite.jpg`,
-		`Меню “Премиум”`,
-		`В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!`,
-		550
-	);
-	const lentenMenuCard = new MenuForTheDayCard(
-		`img/tabs/post.jpg`,
-		`Меню "Постное"`,
-		`Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.`,
-		430
-	);
-	wrapperMenuCards.insertAdjacentHTML("beforeend", fitnessMenuCard.innerHtml);
-	wrapperMenuCards.insertAdjacentHTML("beforeend", premiumMenuCard.innerHtml);
-	wrapperMenuCards.insertAdjacentHTML("beforeend", lentenMenuCard.innerHtml);
+	const getData = async (url) => {
+		const result = await fetch(url);
+
+		if(!result.ok) {
+			throw new Error(`Could not fetch ${url}, status: ${result.status}`);
+		}
+		return await result.json();
+	};
+
+	//динамическое создание карточек без повторяющегося кода. С помощью сервера. Подобие административной панели.
+	getData("http://localhost:3000/menu")
+		.then( dataArr => { //деструктуризация
+			dataArr.forEach( ({img: imgUrl, altimg: altImg, title, descr, price}) => {
+			// dataArr.forEach( object => {
+				// const cardMenu = new MenuForTheDayCard(
+				// 	object.img,
+				// 	object.altimg,
+				// 	object.title,
+				// 	object.descr,
+				// 	object.price
+				// );
+				const cardMenu = new MenuForTheDayCard(
+					imgUrl,
+					altImg,
+					title,
+					descr,
+					price
+				);
+				wrapperMenuCards.insertAdjacentHTML("beforeend", cardMenu.innerHtml);
+			});
+		});
+		
+	///////////////////    AXIOS    /////////////////// 
+	// axios.get("http://localhost:3000/menu")
+	// .then( dataArr => {
+	// 	// dataArr.data.forEach( ({img, altimg, title, descr, price}) => {
+	// 						// const cardMenu = new MenuForTheDayCard(
+	// 			// 	img,
+	// 			// 	altimg,
+	// 			// 	title,
+	// 			// 	descr,
+	// 			// 	price
+	// 			// );
+	// 	dataArr.data.forEach( object => {
+	// 		const cardMenu = new MenuForTheDayCard(
+	// 			object.img,
+	// 			object.altimg,
+	// 			object.title,
+	// 			object.descr,
+	// 			object.price
+	// 		);
+
+	// 		wrapperMenuCards.insertAdjacentHTML("beforeend", cardMenu.innerHtml);
+	// 	});
+	// });
+
+	// const fitnessMenuCard = new MenuForTheDayCard(
+	// 	`img/tabs/vegy.jpg`,
+	// 	"altimg",
+	// 	`Меню "Фитнес"`,
+	// 	`Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!`,
+	// 	229
+	// );
+	// const premiumMenuCard = new MenuForTheDayCard(
+	// 	`img/tabs/elite.jpg`,
+	// 	"altimg",
+	// 	`Меню “Премиум”`,
+	// 	`В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!`,
+	// 	550
+	// );
+	// const lentenMenuCard = new MenuForTheDayCard(
+	// 	`img/tabs/post.jpg`,
+	// 	"altimg",
+	// 	`Меню "Постное"`,
+	// 	`Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.`,
+	// 	430
+	// );
+	// wrapperMenuCards.insertAdjacentHTML("beforeend", fitnessMenuCard.innerHtml);
+	// wrapperMenuCards.insertAdjacentHTML("beforeend", premiumMenuCard.innerHtml);
+	// wrapperMenuCards.insertAdjacentHTML("beforeend", lentenMenuCard.innerHtml);
 
 	
 	// modal
@@ -76,9 +137,7 @@ window.addEventListener("DOMContentLoaded", () => {
 	});
 
 	document.addEventListener("click", (e) => {
-		if (e.target == document.querySelector(".modal_show") 
-			|| 
-			e.target.getAttribute("data-modal-close") == "") {
+		if (e.target == document.querySelector(".modal_show") || e.target.getAttribute("data-modal-close") == "") {
 			closeModal();
 		}
 	});
@@ -88,14 +147,9 @@ window.addEventListener("DOMContentLoaded", () => {
 			closeModal();
 		}
 	});
+
 	window.addEventListener("scroll", showModalByScroll);
 
-	function showModalByScroll() {
-		if (window.scrollY + document.documentElement.clientHeight == document.documentElement.scrollHeight) {
-			openModal();
-			window.removeEventListener("scroll", showModalByScroll);
-		}
-	}
 
 
 	// forms
@@ -107,10 +161,22 @@ window.addEventListener("DOMContentLoaded", () => {
 		  };
 
 	forms.forEach(form => {
-		postData(form);
+		bindPostData(form);
 	});	
 
-	function postData(form) {
+	const postData = async (url, data) => {
+		const result = await fetch(url, {
+			method: "POST",
+			headers: {
+				"Content-type": "application/json"
+			},
+			body: data
+		});
+
+		return await result.json();
+	};
+
+	function bindPostData(form) {
 		form.addEventListener("submit", e => {
 			e.preventDefault();
 
@@ -124,20 +190,12 @@ window.addEventListener("DOMContentLoaded", () => {
 
 			const formData = new FormData(form),
 				  object   = {};
-			
 			formData.forEach((value, key) => {
 				object[key] = value;
 			});
 			const json = JSON.stringify(object);
 
-			fetch('server.php', {
-				method: "POST",
-				headers: {
-					"Content-type": "application/json"
-				},
-				body: json
-			})
-			.then( data => data.text())
+			postData('http://localhost:3000/requests', json)
 			.then( data => {
 				console.log(data);
 				loadingSpinner.remove();
@@ -153,75 +211,58 @@ window.addEventListener("DOMContentLoaded", () => {
 		});
 	}
 
-	function showThanksModal(str) {
-		const modalThanks = document.createElement("div");
-		modalThanks.classList.add("modal", "modal_show");
-		modalThanks.innerHTML = `
-			<div class="modal__dialog">
-				<div class="modal__content">
-					<div data-modal-close class="modal__close">&times;</div>
-					<div class="modal__title">${str}</div>
-				</div>
-			</div>
-		`;
-		modal.insertAdjacentElement("afterend", modalThanks);
-		document.body.style.overflow = "hidden";
+	
+	// slider
+	const sliderContentWrapper = document.querySelector(".offer__slider-wrapper"),
+		  sliderNavsWrapper = document.querySelector(".offer__slider-counter"),
+		  counterSliderTotal = sliderNavsWrapper.querySelector("#total"),
+		  counterSliderCurrent = sliderNavsWrapper.querySelector("#current"),
+		  prevSliderBtn = sliderNavsWrapper.querySelector(".offer__slider-prev"),
+		  nextSliderBtn = sliderNavsWrapper.querySelector(".offer__slider-next");
 
-		const timerIdCloseThanksModal = setTimeout( closeThanksModal, 4000);
+	let	  indexCurrentSlider = 1,
+		  sliderContentArr; 
+		
+	getData("http://localhost:3000/imagesForSlider")
+	.then(dataArr => {
+		dataArr.forEach(contentSlider => {
+			const div = document.createElement("div");
+			div.classList.add("offer__slide");
+			
+			div.innerHTML = `
+				<img src="${contentSlider.imgUrl}" alt="${contentSlider.imgAlt}">
+			`;
+			sliderContentWrapper.append(div);
+		});
+	})
+	.then( () => {
+		sliderContentArr = sliderContentWrapper.querySelectorAll(".offer__slide");
+		// setIndexes(sliderContentArr); //для старой версии слайдера
+		sliderContentArr[indexCurrentSlider-1].classList.add("offer__slide_active");
+		sliderContentWrapper.style.width = `calc(650px*${sliderContentArr.length})`;
 
-		function closeThanksModal() {
-			if(booleanOpenThanksModal) {
-				closeModal();
-			} else {
-				clearInterval(timerIdCloseThanksModal);
-			}
-		}
-	}
+		counterSliderCurrent.innerHTML = getZero(indexCurrentSlider);
+		counterSliderTotal.innerHTML = getZero(sliderContentArr.length);
+	});
 
-	// fetch('https://jsonplaceholder.typicode.com/posts', {
-	// 	method: "POST",
-	// 	body: JSON.stringify({name: "Alex", surname: "Peterson"}),
-	// 	headers: {
-	// 		"Content-type": "application/json"
-	// 	}
-	// })
-	// 	.then(response => response.json())
-	// 	.then(json => console.log(json));
+	nextSliderBtn.addEventListener("click", () => {
+		//меняет индекс и номер слайдера на странице
+		indexCurrentSlider = (indexCurrentSlider == sliderContentArr.length) ? 1 : indexCurrentSlider + 1;
+		
+		changeContentSlider();
+	});
 
-	//////////////////////////////////////////////////////////	
-	// проскроллен ли элемент до полной видимости
-	// const previewBlock = document.querySelector(".tabcontent");
-	// window.addEventListener('wheel', (e) => {
-	// 	const posTop = previewBlock.getBoundingClientRect().top;
-	// 	e.preventDefault();
-	// 	if (posTop + previewBlock.clientHeight <= window.innerHeight && posTop > 0) {
+	prevSliderBtn.addEventListener("click", (e) => {
+		//меняет индекс и номер слайдера на странице
+		indexCurrentSlider = (indexCurrentSlider == 1) ? sliderContentArr.length : indexCurrentSlider - 1;
 
-	// 	}
-	// });
-	//////////////////////////////////////////////////////////
-	// test horizontal wheel - do NOT work...
-	// (function() {
+		changeContentSlider();
+	});
 
-	// 	function scrollHorizontally(e) {
-	// 		e = window.event || e;
-	// 		var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-	// 		document.getElementById('statistic-table').scrollLeft -= (delta*10); // Multiplied by 10
-	// 		e.preventDefault();
-	// 	}
-	// 	if (document.getElementById('statistic-table').addEventListener) {
-	// 		// IE9, Chrome, Safari, Opera
-	// 		document.getElementById('statistic-table').addEventListener("mousewheel", scrollHorizontally, false);
-	// 		// Firefox
-	// 		document.getElementById('statistic-table').addEventListener("DOMMouseScroll", scrollHorizontally, false);
-	// 	} else {
-	// 		// IE 6/7/8
-	// 		document.getElementById('statistic-table').attachEvent("onmousewheel", scrollHorizontally);
-	// 	}
-
-	// })();
 
 
 	/////////* functions */////////
+	
 	// for Tabs
 	function toggleTabContent(clickedElement) {
 		if (
@@ -248,11 +289,12 @@ window.addEventListener("DOMContentLoaded", () => {
 		tabsContent[tab.dataset.index].classList.add("tabcontent_active", "fade");
 	}
 
-	function setTabsIndex() { //для сопоставления таба и контента
-		tabs.forEach((tab, i) => {
-			tab.dataset.index = i;
+	function setIndexes(elementsArr) { //для сопоставления таба/слайда и контента
+		elementsArr.forEach((element, i) => {
+			element.dataset.index = i;
 		});
 	}
+
 	// for Countdown Time Promotion
 	function getZero(num) {
 		if (num >= 0 && num < 10) {
@@ -342,4 +384,107 @@ window.addEventListener("DOMContentLoaded", () => {
 		booleanOpenThanksModal = false;
 		document.body.style.overflow = "";
 	}
+
+	function showModalByScroll() {
+		if (window.scrollY + document.documentElement.clientHeight == document.documentElement.scrollHeight) {
+			openModal();
+			window.removeEventListener("scroll", showModalByScroll);
+		}
+	}
+
+	function showThanksModal(str) {
+		const modalThanks = document.createElement("div");
+		modalThanks.classList.add("modal", "modal_show");
+		modalThanks.innerHTML = `
+			<div class="modal__dialog">
+				<div class="modal__content">
+					<div data-modal-close class="modal__close">&times;</div>
+					<div class="modal__title">${str}</div>
+				</div>
+			</div>
+		`;
+		modal.insertAdjacentElement("afterend", modalThanks);
+		document.body.style.overflow = "hidden";
+
+		const timerIdCloseThanksModal = setTimeout( closeThanksModal, 4000);
+
+		function closeThanksModal() {
+			if(booleanOpenThanksModal) {
+				closeModal();
+			} else {
+				clearInterval(timerIdCloseThanksModal);
+			}
+		}
+	}
+
+	// for slider
+	function changeContentSlider() {
+		counterSliderCurrent.innerHTML = getZero(indexCurrentSlider);
+		sliderContentWrapper.style.left = `calc(-650px * ${indexCurrentSlider - 1})`;
+
+		// Старая версия слайдера:
+		// sliderContentArr.forEach(content => {
+		// 	content.classList.remove("offer__slide_active");
+		// 	if(content.dataset.index == indexCurrentSlider-1) {
+		// 		content.classList.add("offer__slide_active");
+		// 	}
+		// });
+	}
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// fetch('https://jsonplaceholder.typicode.com/posts', {
+	// 	method: "POST",
+	// 	body: JSON.stringify({name: "Alex", surname: "Peterson"}),
+	// 	headers: {
+	// 		"Content-type": "application/json"
+	// 	}
+	// })
+	// 	.then(response => response.json())
+	// 	.then(json => console.log(json));
+
+	//////////////////////////////////////////////////////////	
+	// проскроллен ли элемент до полной видимости
+	// const previewBlock = document.querySelector(".tabcontent");
+	// window.addEventListener('wheel', (e) => {
+	// 	const posTop = previewBlock.getBoundingClientRect().top;
+	// 	e.preventDefault();
+	// 	if (posTop + previewBlock.clientHeight <= window.innerHeight && posTop > 0) {
+
+	// 	}
+	// });
+	//////////////////////////////////////////////////////////
+	// test horizontal wheel - do NOT work...
+	// (function() {
+
+	// 	function scrollHorizontally(e) {
+	// 		e = window.event || e;
+	// 		var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+	// 		document.getElementById('statistic-table').scrollLeft -= (delta*10); // Multiplied by 10
+	// 		e.preventDefault();
+	// 	}
+	// 	if (document.getElementById('statistic-table').addEventListener) {
+	// 		// IE9, Chrome, Safari, Opera
+	// 		document.getElementById('statistic-table').addEventListener("mousewheel", scrollHorizontally, false);
+	// 		// Firefox
+	// 		document.getElementById('statistic-table').addEventListener("DOMMouseScroll", scrollHorizontally, false);
+	// 	} else {
+	// 		// IE 6/7/8
+	// 		document.getElementById('statistic-table').attachEvent("onmousewheel", scrollHorizontally);
+	// 	}
+
+	// })();
