@@ -218,10 +218,13 @@ window.addEventListener("DOMContentLoaded", () => {
 		  counterSliderTotal = sliderNavsWrapper.querySelector("#total"),
 		  counterSliderCurrent = sliderNavsWrapper.querySelector("#current"),
 		  prevSliderBtn = sliderNavsWrapper.querySelector(".offer__slider-prev"),
-		  nextSliderBtn = sliderNavsWrapper.querySelector(".offer__slider-next");
+		  nextSliderBtn = sliderNavsWrapper.querySelector(".offer__slider-next"),
+		  dotsNavWrapper = document.querySelector(".offer__slider-dots");
 
 	let	  indexCurrentSlider = 1,
-		  sliderContentArr; 
+		  sliderContentArr = [],
+		  dotsNav = [],
+		  width;
 		
 	getData("http://localhost:3000/imagesForSlider")
 	.then(dataArr => {
@@ -236,10 +239,13 @@ window.addEventListener("DOMContentLoaded", () => {
 		});
 	})
 	.then( () => {
+		width = window.getComputedStyle(document.querySelector(".offer__slider-wrapper-long")).width;
 		sliderContentArr = sliderContentWrapper.querySelectorAll(".offer__slide");
 		// setIndexes(sliderContentArr); //для старой версии слайдера
 		sliderContentArr[indexCurrentSlider-1].classList.add("offer__slide_active");
-		sliderContentWrapper.style.width = `calc(650px*${sliderContentArr.length})`;
+		createNavsForSlider(dotsNavWrapper, dotsNav);
+
+		sliderContentWrapper.style.width = `calc( ${width} * ${sliderContentArr.length})`;
 
 		counterSliderCurrent.innerHTML = getZero(indexCurrentSlider);
 		counterSliderTotal.innerHTML = getZero(sliderContentArr.length);
@@ -258,6 +264,31 @@ window.addEventListener("DOMContentLoaded", () => {
 
 		changeContentSlider();
 	});
+
+	dotsNavWrapper.addEventListener("click", (e) => {
+		const target = e.target;
+		if( target.classList.contains("offer__slider-dot") 
+			&&
+			!target.classList.contains("offer__slider-dot_active")) {
+				indexCurrentSlider = +target.dataset.index + 1;
+				changeContentSlider();
+			}
+	});
+
+	function createNavsForSlider(dotsNavWrapper, dotsNav) {
+		dotsNavWrapper.style.width = `calc( 60 * ${sliderContentArr.length}px )`;
+		dotsNavWrapper.style.height = `20px`;
+		for(let i = 0; i < sliderContentArr.length; i++) {
+			dotsNav[i] = document.createElement("div");
+			dotsNav[i].classList.add("offer__slider-dot");
+
+			dotsNavWrapper.insertAdjacentElement("beforeend", dotsNav[i]);
+		}
+		dotsNav[0].classList.add("offer__slider-dot_active");
+		setIndexes(dotsNav);
+	}
+
+	
 
 
 
@@ -419,8 +450,19 @@ window.addEventListener("DOMContentLoaded", () => {
 
 	// for slider
 	function changeContentSlider() {
+		//смена номера текущего слайда и анимация на нужной dotNav
 		counterSliderCurrent.innerHTML = getZero(indexCurrentSlider);
-		sliderContentWrapper.style.left = `calc(-650px * ${indexCurrentSlider - 1})`;
+		dotsNav.forEach( dot => {
+			dot.classList.remove("offer__slider-dot_active");
+			if(dot.dataset.index == indexCurrentSlider - 1) {
+				dot.classList.add("offer__slider-dot_active");
+			}
+		});
+
+		//смена контента слайда
+		sliderContentWrapper.style.left = `calc(-${width} * ${indexCurrentSlider - 1})`;
+		
+
 
 		// Старая версия слайдера:
 		// sliderContentArr.forEach(content => {

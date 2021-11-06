@@ -239,6 +239,7 @@ a {
     flex-direction: column;
     align-items: flex-end; }
     .offer__slider-counter {
+      position: relative;
       display: flex;
       width: 180px;
       align-items: center;
@@ -277,6 +278,32 @@ a {
       height: 100%; }
     .offer__slide_active {
       display: block; }
+  .offer__slider-dots {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 15;
+    display: flex;
+    justify-content: center;
+    margin-right: 15%;
+    margin-left: 15%; }
+  .offer__slider-dot {
+    box-sizing: content-box;
+    flex: 0 1 auto;
+    width: 30px;
+    height: 6px;
+    margin-right: 3px;
+    margin-left: 3px;
+    cursor: pointer;
+    background-color: #fff;
+    background-clip: padding-box;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    opacity: .5;
+    transition: opacity .6s ease; }
+    .offer__slider-dot_active {
+      opacity: 1; }
 
 .calculating {
   padding: 50px 0; }
