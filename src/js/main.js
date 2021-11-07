@@ -269,31 +269,156 @@ window.addEventListener("DOMContentLoaded", () => {
 		const target = e.target;
 		if( target.classList.contains("offer__slider-dot") 
 			&&
-			!target.classList.contains("offer__slider-dot_active")) {
+			!target.classList.contains("offer__slider-dot_active")) 
+			{
 				indexCurrentSlider = +target.dataset.index + 1;
 				changeContentSlider();
 			}
 	});
 
-	function createNavsForSlider(dotsNavWrapper, dotsNav) {
-		dotsNavWrapper.style.width = `calc( 60 * ${sliderContentArr.length}px )`;
-		dotsNavWrapper.style.height = `20px`;
-		for(let i = 0; i < sliderContentArr.length; i++) {
-			dotsNav[i] = document.createElement("div");
-			dotsNav[i].classList.add("offer__slider-dot");
 
-			dotsNavWrapper.insertAdjacentElement("beforeend", dotsNav[i]);
+	// calculating calorieAllowance
+	const calculatingWrapper = document.querySelector(".calculating__field"),
+		  genderWrapper = calculatingWrapper.querySelector("#gender"),
+		  valueBodyWrapper = calculatingWrapper.querySelector("#bodyValue"),
+		  activityWrapper = calculatingWrapper.querySelector("#activity"),
+		  heigthSm = valueBodyWrapper.querySelector("#height"),
+		  weightKg = valueBodyWrapper.querySelector("#weight"),
+		  age = valueBodyWrapper.querySelector("#age"),
+		  calculatingResult = calculatingWrapper.querySelector(".calculating__result span");
+
+		  
+	let inputGender = "female",
+		inputActivity = "small",
+		BMR,
+		calorieAllowance;
+		
+	getLocalStorageValues();
+	calculatingCalorieAllowance();
+
+	genderWrapper.addEventListener("click", (e) => {
+		const target = e.target,
+		  	  calculatingChoose = genderWrapper.querySelectorAll(".calculating__choose-item");
+		
+		if( target.classList.contains("calculating__choose-item") 
+			&& 
+			!target.classList.contains("calculating__choose-item_active")) 
+			{
+			inputGender = target.dataset.gender;
+
+			calculatingChoose.forEach(element => {
+				element.classList.toggle("calculating__choose-item_active");
+				// element.classList.remove("calculating__choose-item_active");
+				// if(target == element) element.classList.add("calculating__choose-item_active");
+			});
 		}
-		dotsNav[0].classList.add("offer__slider-dot_active");
-		setIndexes(dotsNav);
+
+		calculatingCalorieAllowance();
+	});
+
+	activityWrapper.addEventListener("click", (e) => {
+		const target = e.target,
+			  activityValue = activityWrapper.querySelectorAll(".calculating__choose-item");
+
+		if(target.classList.contains("calculating__choose-item") 
+		&& 
+		!target.classList.contains("calculating__choose-item_active")) 
+		{
+			inputActivity = target.id;
+
+			activityValue.forEach(element => {
+				element.classList.remove("calculating__choose-item_active");
+				if(target == element) element.classList.add("calculating__choose-item_active");
+			});
+		}
+
+		calculatingCalorieAllowance();
+	});
+
+	valueBodyWrapper.addEventListener("input", () => {
+		const valueBody = [heigthSm, weightKg, age];
+
+		valueBody.forEach(element => {
+			if(element.value == "") {
+				element.style.border = "solid 2px red";
+			}
+			else {
+				element.value = (deleteNotDigits(element.value));
+				element.style.border = "";
+			}
+		});
+
+		calculatingCalorieAllowance();
+	});
+
+
+	function calculatingCalorieAllowance() {
+		setLocalStorageValues();
+
+		if(heigthSm.value && weightKg.value && age.value) {
+			switch(inputGender) {
+				case "male":
+					BMR = 88.36 + (13.4 * weightKg.value) + (4.8 * heigthSm.value) - (5.7 * age.value);
+					break;
+				case "female":
+					BMR = 447.6 + (9.2 * weightKg.value) + (3.1 * heigthSm.value) - (4.3 * age.value);
+					break;
+			}
+
+
+			switch(inputActivity) {
+				case "low": 
+					calorieAllowance = BMR * 1.2;
+					break;
+				case "small":
+					calorieAllowance = BMR * 1.375;
+					break;
+				case "medium":
+					calorieAllowance = BMR * 1.55;
+					break;
+				case "high": 
+					calorieAllowance = BMR * 1.725;
+					break;
+			}
+
+			calculatingResult.textContent = Math.round(calorieAllowance);
+		}
+		else {
+			calculatingResult.textContent = "X";
+		}
 	}
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 	/////////* functions */////////
 	
+	//universal
+	function getZero(num) {
+		if (num >= 0 && num < 10) {
+			return `0${num}`;
+		} else {
+			return num;
+		}
+	}
+
+	function deleteNotDigits(str) {
+		return str.replace(/\D/gi, "");
+	}
+
+
 	// for Tabs
 	function toggleTabContent(clickedElement) {
 		if (
@@ -326,15 +451,8 @@ window.addEventListener("DOMContentLoaded", () => {
 		});
 	}
 
-	// for Countdown Time Promotion
-	function getZero(num) {
-		if (num >= 0 && num < 10) {
-			return `0${num}`;
-		} else {
-			return num;
-		}
-	}
 
+	// for Countdown Time Promotion
 	function initCountdown(selectorWrapperTimer, endDatePromotion) {
 		const timer = document.querySelector(selectorWrapperTimer),
 			daysBlock = document.getElementById("days"),
@@ -401,6 +519,7 @@ window.addEventListener("DOMContentLoaded", () => {
 		}
 	}
 
+
 	// for modal
 	function openModal() {
 		modal.classList.add("modal_show");
@@ -448,6 +567,7 @@ window.addEventListener("DOMContentLoaded", () => {
 		}
 	}
 
+
 	// for slider
 	function changeContentSlider() {
 		//смена номера текущего слайда и анимация на нужной dotNav
@@ -471,6 +591,41 @@ window.addEventListener("DOMContentLoaded", () => {
 		// 		content.classList.add("offer__slide_active");
 		// 	}
 		// });
+	}
+
+	function createNavsForSlider(dotsNavWrapper, dotsNav) {
+		for(let i = 0; i < sliderContentArr.length; i++) {
+			dotsNav[i] = document.createElement("div");
+			dotsNav[i].classList.add("offer__slider-dot");
+
+			dotsNavWrapper.insertAdjacentElement("beforeend", dotsNav[i]);
+		}
+		dotsNav[0].classList.add("offer__slider-dot_active");
+		setIndexes(dotsNav);
+	}
+
+
+	// for calculating calorie allowance
+	function getLocalStorageValues() {
+		inputGender = localStorage.getItem("inputGender") ? localStorage.getItem("inputGender") : inputGender;
+		inputActivity = localStorage.getItem("inputActivity") ? localStorage.getItem("inputActivity") : inputActivity;
+		heigthSm.value = localStorage.getItem("heigthSm.value") ? localStorage.getItem("heigthSm.value") : "";
+		weightKg.value = localStorage.getItem("weightKg.value") ? localStorage.getItem("weightKg.value") : "";
+		age.value = localStorage.getItem("age.value") ? localStorage.getItem("age.value") : "";
+
+		document.querySelectorAll(".calculating__choose-item_active").forEach(element => {
+			element.classList.remove("calculating__choose-item_active");
+		});
+		document.querySelector(`[data-gender="${inputGender}"]`).classList.add("calculating__choose-item_active");
+		document.querySelector(`#${inputActivity}`).classList.add("calculating__choose-item_active");
+	}
+
+	function setLocalStorageValues() {
+		localStorage.setItem("inputGender", inputGender);
+		localStorage.setItem("inputActivity", inputActivity);
+		localStorage.setItem("heigthSm.value", heigthSm.value);
+		localStorage.setItem("weightKg.value", weightKg.value);
+		localStorage.setItem("age.value", age.value);
 	}
 });
 
@@ -530,3 +685,9 @@ window.addEventListener("DOMContentLoaded", () => {
 	// 	}
 
 	// })();
+
+
+	// localStorage.setItem("number", 5);
+	// localStorage.removeItem("number");
+	// localStorage.clear();
+	// console.log(localStorage.getItem("number"));
