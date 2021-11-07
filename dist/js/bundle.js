@@ -2509,251 +2509,84 @@ module.exports = g;
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var core_js_modules_es_string_replace__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es.string.replace */ "./node_modules/core-js/modules/es.string.replace.js");
-/* harmony import */ var core_js_modules_es_string_replace__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_replace__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _modules_calculatingCalorie__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./modules/calculatingCalorie */ "./src/js/modules/calculatingCalorie.js");
+/* harmony import */ var _modules_cards__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modules/cards */ "./src/js/modules/cards.js");
+/* harmony import */ var _modules_countdownTimer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/countdownTimer */ "./src/js/modules/countdownTimer.js");
+/* harmony import */ var _modules_forms__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/forms */ "./src/js/modules/forms.js");
+/* harmony import */ var _modules_modal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modules/modal */ "./src/js/modules/modal.js");
+/* harmony import */ var _modules_slider__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./modules/slider */ "./src/js/modules/slider.js");
+/* harmony import */ var _modules_tabs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./modules/tabs */ "./src/js/modules/tabs.js");
+
+
+
+
+
+
 
 
 
 window.addEventListener("DOMContentLoaded", () => {
-  // tabs
-  const tabs = document.querySelectorAll(".tabheader__item"),
-        tabsParent = document.querySelector(".tabheader__items"),
-        tabsContent = document.querySelectorAll(".tabcontent");
-  setIndexes(tabs);
-  tabsParent.addEventListener("click", event => {
-    const clickedElement = event.target;
-    toggleTabContent(clickedElement);
-  }); // countdown(обратный отсчет времени)
+  Object(_modules_tabs__WEBPACK_IMPORTED_MODULE_6__["default"])();
+  Object(_modules_countdownTimer__WEBPACK_IMPORTED_MODULE_2__["default"])();
+  Object(_modules_cards__WEBPACK_IMPORTED_MODULE_1__["default"])();
+  Object(_modules_modal__WEBPACK_IMPORTED_MODULE_4__["default"])(".modal", "[data-modal-show]");
+  Object(_modules_forms__WEBPACK_IMPORTED_MODULE_3__["default"])(".modal");
+  Object(_modules_slider__WEBPACK_IMPORTED_MODULE_5__["default"])();
+  Object(_modules_calculatingCalorie__WEBPACK_IMPORTED_MODULE_0__["default"])();
+}); // fetch('https://jsonplaceholder.typicode.com/posts', {
+// 	method: "POST",
+// 	body: JSON.stringify({name: "Alex", surname: "Peterson"}),
+// 	headers: {
+// 		"Content-type": "application/json"
+// 	}
+// })
+// 	.then(response => response.json())
+// 	.then(json => console.log(json));
+//////////////////////////////////////////////////////////	
+// проскроллен ли элемент до полной видимости
+// const previewBlock = document.querySelector(".tabcontent");
+// window.addEventListener('wheel', (e) => {
+// 	const posTop = previewBlock.getBoundingClientRect().top;
+// 	e.preventDefault();
+// 	if (posTop + previewBlock.clientHeight <= window.innerHeight && posTop > 0) {
+// 	}
+// });
+//////////////////////////////////////////////////////////
+// test horizontal wheel - do NOT work...
+// (function() {
+// 	function scrollHorizontally(e) {
+// 		e = window.event || e;
+// 		var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+// 		document.getElementById('statistic-table').scrollLeft -= (delta*10); // Multiplied by 10
+// 		e.preventDefault();
+// 	}
+// 	if (document.getElementById('statistic-table').addEventListener) {
+// 		// IE9, Chrome, Safari, Opera
+// 		document.getElementById('statistic-table').addEventListener("mousewheel", scrollHorizontally, false);
+// 		// Firefox
+// 		document.getElementById('statistic-table').addEventListener("DOMMouseScroll", scrollHorizontally, false);
+// 	} else {
+// 		// IE 6/7/8
+// 		document.getElementById('statistic-table').attachEvent("onmousewheel", scrollHorizontally);
+// 	}
+// })();
 
-  const endDatePromotion = '2022-01-01';
-  initCountdown(".promotion__timer", endDatePromotion); // dynamic layout menu card
+/***/ }),
 
-  const wrapperMenuCards = document.querySelector(".menu__field > .container");
+/***/ "./src/js/modules/calculatingCalorie.js":
+/*!**********************************************!*\
+  !*** ./src/js/modules/calculatingCalorie.js ***!
+  \**********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-  class MenuForTheDayCard {
-    constructor(urlToImageMenu, altimg, subtitleMenu, descriptionMenu, priceAtDay, ...modificationsClasses) {
-      this.urlToImageMenu = urlToImageMenu;
-      this.altimg = altimg;
-      this.subtitleMenu = subtitleMenu;
-      this.menuDescription = descriptionMenu;
-      this.priceAtDay = priceAtDay;
-      this.innerHtml = `
-			<div class="menu__item">
-				<img src="${urlToImageMenu}" alt="${altimg}">
-				<h3 class="menu__item-subtitle">${subtitleMenu}</h3>
-				<div class="menu__item-descr">${descriptionMenu}</div>
-				<div class="menu__item-divider"></div>
-				<div class="menu__item-price">
-					<div class="menu__item-cost">Цена:</div>
-					<div class="menu__item-total"><span>${priceAtDay}</span> руб/день</div>
-				</div>
-			</div>
-		`;
-    }
-
-  }
-
-  const getData = async url => {
-    const result = await fetch(url);
-
-    if (!result.ok) {
-      throw new Error(`Could not fetch ${url}, status: ${result.status}`);
-    }
-
-    return await result.json();
-  }; //динамическое создание карточек без повторяющегося кода. С помощью сервера. Подобие административной панели.
-
-
-  getData("http://localhost:3000/menu").then(dataArr => {
-    //деструктуризация
-    dataArr.forEach(({
-      img: imgUrl,
-      altimg: altImg,
-      title,
-      descr,
-      price
-    }) => {
-      // dataArr.forEach( object => {
-      // const cardMenu = new MenuForTheDayCard(
-      // 	object.img,
-      // 	object.altimg,
-      // 	object.title,
-      // 	object.descr,
-      // 	object.price
-      // );
-      const cardMenu = new MenuForTheDayCard(imgUrl, altImg, title, descr, price);
-      wrapperMenuCards.insertAdjacentHTML("beforeend", cardMenu.innerHtml);
-    });
-  }); ///////////////////    AXIOS    /////////////////// 
-  // axios.get("http://localhost:3000/menu")
-  // .then( dataArr => {
-  // 	// dataArr.data.forEach( ({img, altimg, title, descr, price}) => {
-  // 						// const cardMenu = new MenuForTheDayCard(
-  // 			// 	img,
-  // 			// 	altimg,
-  // 			// 	title,
-  // 			// 	descr,
-  // 			// 	price
-  // 			// );
-  // 	dataArr.data.forEach( object => {
-  // 		const cardMenu = new MenuForTheDayCard(
-  // 			object.img,
-  // 			object.altimg,
-  // 			object.title,
-  // 			object.descr,
-  // 			object.price
-  // 		);
-  // 		wrapperMenuCards.insertAdjacentHTML("beforeend", cardMenu.innerHtml);
-  // 	});
-  // });
-  // const fitnessMenuCard = new MenuForTheDayCard(
-  // 	`img/tabs/vegy.jpg`,
-  // 	"altimg",
-  // 	`Меню "Фитнес"`,
-  // 	`Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!`,
-  // 	229
-  // );
-  // const premiumMenuCard = new MenuForTheDayCard(
-  // 	`img/tabs/elite.jpg`,
-  // 	"altimg",
-  // 	`Меню “Премиум”`,
-  // 	`В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!`,
-  // 	550
-  // );
-  // const lentenMenuCard = new MenuForTheDayCard(
-  // 	`img/tabs/post.jpg`,
-  // 	"altimg",
-  // 	`Меню "Постное"`,
-  // 	`Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.`,
-  // 	430
-  // );
-  // wrapperMenuCards.insertAdjacentHTML("beforeend", fitnessMenuCard.innerHtml);
-  // wrapperMenuCards.insertAdjacentHTML("beforeend", premiumMenuCard.innerHtml);
-  // wrapperMenuCards.insertAdjacentHTML("beforeend", lentenMenuCard.innerHtml);
-  // modal
-
-  const modal = document.querySelector(".modal"),
-        modalShowElems = document.querySelectorAll("[data-modal-show]"),
-        modalTimerId = setTimeout(openModal, 20000);
-  let booleanOpenThanksModal = false;
-  modalShowElems.forEach(showElemBtn => {
-    showElemBtn.addEventListener("click", openModal);
-  });
-  document.addEventListener("click", e => {
-    if (e.target == document.querySelector(".modal_show") || e.target.getAttribute("data-modal-close") == "") {
-      closeModal();
-    }
-  });
-  document.addEventListener("keydown", e => {
-    if (e.code == "Escape") {
-      closeModal();
-    }
-  });
-  window.addEventListener("scroll", showModalByScroll); // forms
-
-  const forms = document.querySelectorAll("form"),
-        messages = {
-    loading: "icons/spinner.svg",
-    success: "Спасибо! Мы скоро с Вами свяжемся",
-    failure: "Что-то пошло не так..."
-  };
-  forms.forEach(form => {
-    bindPostData(form);
-  });
-
-  const postData = async (url, data) => {
-    const result = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json"
-      },
-      body: data
-    });
-    return await result.json();
-  };
-
-  function bindPostData(form) {
-    form.addEventListener("submit", e => {
-      e.preventDefault();
-      const loadingSpinner = document.createElement("img");
-      loadingSpinner.src = messages.loading;
-      loadingSpinner.style.cssText = `
-				display: block;
-				margin: 0 auto;
-			`;
-      form.insertAdjacentElement("afterend", loadingSpinner);
-      const formData = new FormData(form),
-            object = {};
-      formData.forEach((value, key) => {
-        object[key] = value;
-      });
-      const json = JSON.stringify(object);
-      postData('http://localhost:3000/requests', json).then(data => {
-        console.log(data);
-        loadingSpinner.remove();
-        form.reset();
-
-        if (modal.classList.contains("modal_show")) {
-          closeModal();
-        }
-
-        showThanksModal(messages.success);
-      }).catch(() => {
-        showThanksModal(messages.failure);
-      });
-    });
-  } // slider
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _universalFunctions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./universalFunctions */ "./src/js/modules/universalFunctions.js");
 
 
-  const sliderContentWrapper = document.querySelector(".offer__slider-wrapper"),
-        sliderNavsWrapper = document.querySelector(".offer__slider-counter"),
-        counterSliderTotal = sliderNavsWrapper.querySelector("#total"),
-        counterSliderCurrent = sliderNavsWrapper.querySelector("#current"),
-        prevSliderBtn = sliderNavsWrapper.querySelector(".offer__slider-prev"),
-        nextSliderBtn = sliderNavsWrapper.querySelector(".offer__slider-next"),
-        dotsNavWrapper = document.querySelector(".offer__slider-dots");
-  let indexCurrentSlider = 1,
-      sliderContentArr = [],
-      dotsNav = [],
-      width;
-  getData("http://localhost:3000/imagesForSlider").then(dataArr => {
-    dataArr.forEach(contentSlider => {
-      const div = document.createElement("div");
-      div.classList.add("offer__slide");
-      div.innerHTML = `
-				<img src="${contentSlider.imgUrl}" alt="${contentSlider.imgAlt}">
-			`;
-      sliderContentWrapper.append(div);
-    });
-  }).then(() => {
-    width = window.getComputedStyle(document.querySelector(".offer__slider-wrapper-long")).width;
-    sliderContentArr = sliderContentWrapper.querySelectorAll(".offer__slide"); // setIndexes(sliderContentArr); //для старой версии слайдера
-
-    sliderContentArr[indexCurrentSlider - 1].classList.add("offer__slide_active");
-    createNavsForSlider(dotsNavWrapper, dotsNav);
-    sliderContentWrapper.style.width = `calc( ${width} * ${sliderContentArr.length})`;
-    counterSliderCurrent.innerHTML = getZero(indexCurrentSlider);
-    counterSliderTotal.innerHTML = getZero(sliderContentArr.length);
-  });
-  nextSliderBtn.addEventListener("click", () => {
-    //меняет индекс и номер слайдера на странице
-    indexCurrentSlider = indexCurrentSlider == sliderContentArr.length ? 1 : indexCurrentSlider + 1;
-    changeContentSlider();
-  });
-  prevSliderBtn.addEventListener("click", e => {
-    //меняет индекс и номер слайдера на странице
-    indexCurrentSlider = indexCurrentSlider == 1 ? sliderContentArr.length : indexCurrentSlider - 1;
-    changeContentSlider();
-  });
-  dotsNavWrapper.addEventListener("click", e => {
-    const target = e.target;
-
-    if (target.classList.contains("offer__slider-dot") && !target.classList.contains("offer__slider-dot_active")) {
-      indexCurrentSlider = +target.dataset.index + 1;
-      changeContentSlider();
-    }
-  }); // calculating calorieAllowance
-
+function calculatingCalorie() {
+  // calculating calorieAllowance
   const calculatingWrapper = document.querySelector(".calculating__field"),
         genderWrapper = calculatingWrapper.querySelector("#gender"),
         valueBodyWrapper = calculatingWrapper.querySelector("#bodyValue"),
@@ -2802,7 +2635,7 @@ window.addEventListener("DOMContentLoaded", () => {
       if (element.value == "") {
         element.style.border = "solid 2px red";
       } else {
-        element.value = deleteNotDigits(element.value);
+        element.value = Object(_universalFunctions__WEBPACK_IMPORTED_MODULE_0__["deleteNotDigits"])(element.value);
         element.style.border = "";
       }
     });
@@ -2845,51 +2678,138 @@ window.addEventListener("DOMContentLoaded", () => {
     } else {
       calculatingResult.textContent = "X";
     }
-  } /////////* functions */////////
-  //universal
+  }
+
+  function getLocalStorageValues() {
+    inputGender = localStorage.getItem("inputGender") ? localStorage.getItem("inputGender") : inputGender;
+    inputActivity = localStorage.getItem("inputActivity") ? localStorage.getItem("inputActivity") : inputActivity;
+    heigthSm.value = localStorage.getItem("heigthSm.value") ? localStorage.getItem("heigthSm.value") : "";
+    weightKg.value = localStorage.getItem("weightKg.value") ? localStorage.getItem("weightKg.value") : "";
+    age.value = localStorage.getItem("age.value") ? localStorage.getItem("age.value") : "";
+    document.querySelectorAll(".calculating__choose-item_active").forEach(element => {
+      element.classList.remove("calculating__choose-item_active");
+    });
+    document.querySelector(`[data-gender="${inputGender}"]`).classList.add("calculating__choose-item_active");
+    document.querySelector(`#${inputActivity}`).classList.add("calculating__choose-item_active");
+  }
+
+  function setLocalStorageValues() {
+    localStorage.setItem("inputGender", inputGender);
+    localStorage.setItem("inputActivity", inputActivity);
+    localStorage.setItem("heigthSm.value", heigthSm.value);
+    localStorage.setItem("weightKg.value", weightKg.value);
+    localStorage.setItem("age.value", age.value);
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (calculatingCalorie);
+
+/***/ }),
+
+/***/ "./src/js/modules/cards.js":
+/*!*********************************!*\
+  !*** ./src/js/modules/cards.js ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _universalFunctions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./universalFunctions */ "./src/js/modules/universalFunctions.js");
 
 
-  function getZero(num) {
-    if (num >= 0 && num < 10) {
-      return `0${num}`;
-    } else {
-      return num;
+function cards() {
+  // dynamic layout menu card
+  const wrapperMenuCards = document.querySelector(".menu__field > .container");
+
+  class MenuForTheDayCard {
+    constructor(urlToImageMenu, altimg, subtitleMenu, descriptionMenu, priceAtDay, ...modificationsClasses) {
+      this.urlToImageMenu = urlToImageMenu;
+      this.altimg = altimg;
+      this.subtitleMenu = subtitleMenu;
+      this.menuDescription = descriptionMenu;
+      this.priceAtDay = priceAtDay;
+      this.innerHtml = `
+			<div class="menu__item">
+				<img src="${urlToImageMenu}" alt="${altimg}">
+				<h3 class="menu__item-subtitle">${subtitleMenu}</h3>
+				<div class="menu__item-descr">${descriptionMenu}</div>
+				<div class="menu__item-divider"></div>
+				<div class="menu__item-price">
+					<div class="menu__item-cost">Цена:</div>
+					<div class="menu__item-total"><span>${priceAtDay}</span> руб/день</div>
+				</div>
+			</div>
+		`;
     }
-  }
 
-  function deleteNotDigits(str) {
-    return str.replace(/\D/gi, "");
-  } // for Tabs
+  } //динамическое создание карточек без повторяющегося кода. С помощью сервера. Подобие административной панели.
 
 
-  function toggleTabContent(clickedElement) {
-    if (clickedElement && clickedElement.classList.contains("tabheader__item") && !clickedElement.classList.contains("tabheader__item_active")) {
-      hideTabsContent();
-      showTabsContent(clickedElement);
-    }
-  }
-
-  function hideTabsContent() {
-    tabs.forEach(tab => {
-      tab.classList.remove("tabheader__item_active");
+  Object(_universalFunctions__WEBPACK_IMPORTED_MODULE_0__["getData"])("http://localhost:3000/menu").then(dataArr => {
+    //деструктуризация
+    dataArr.forEach(({
+      img: imgUrl,
+      altimg: altImg,
+      title,
+      descr,
+      price
+    }) => {
+      // dataArr.forEach( object => {
+      // const cardMenu = new MenuForTheDayCard(
+      // 	object.img,
+      // 	object.altimg,
+      // 	object.title,
+      // 	object.descr,
+      // 	object.price
+      // );
+      const cardMenu = new MenuForTheDayCard(imgUrl, altImg, title, descr, price);
+      wrapperMenuCards.insertAdjacentHTML("beforeend", cardMenu.innerHtml);
     });
-    tabsContent.forEach(tabContent => {
-      tabContent.classList.remove("tabcontent_active", "fade");
-    });
-  }
+  }); ///////////////////    AXIOS    /////////////////// 
+  // axios.get("http://localhost:3000/menu")
+  // .then( dataArr => {
+  // 	// dataArr.data.forEach( ({img, altimg, title, descr, price}) => {
+  // 						// const cardMenu = new MenuForTheDayCard(
+  // 			// 	img,
+  // 			// 	altimg,
+  // 			// 	title,
+  // 			// 	descr,
+  // 			// 	price
+  // 			// );
+  // 	dataArr.data.forEach( object => {
+  // 		const cardMenu = new MenuForTheDayCard(
+  // 			object.img,
+  // 			object.altimg,
+  // 			object.title,
+  // 			object.descr,
+  // 			object.price
+  // 		);
+  // 		wrapperMenuCards.insertAdjacentHTML("beforeend", cardMenu.innerHtml);
+  // 	});
+  // });
+}
 
-  function showTabsContent(tab) {
-    tab.classList.add("tabheader__item_active");
-    tabsContent[tab.dataset.index].classList.add("tabcontent_active", "fade");
-  }
+/* harmony default export */ __webpack_exports__["default"] = (cards);
 
-  function setIndexes(elementsArr) {
-    //для сопоставления таба/слайда и контента
-    elementsArr.forEach((element, i) => {
-      element.dataset.index = i;
-    });
-  } // for Countdown Time Promotion
+/***/ }),
 
+/***/ "./src/js/modules/countdownTimer.js":
+/*!******************************************!*\
+  !*** ./src/js/modules/countdownTimer.js ***!
+  \******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _universalFunctions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./universalFunctions */ "./src/js/modules/universalFunctions.js");
+
+
+function countdown() {
+  // countdown(обратный отсчет времени)
+  const endDatePromotion = '2022-01-01';
+  initCountdown(".promotion__timer", endDatePromotion);
 
   function initCountdown(selectorWrapperTimer, endDatePromotion) {
     const timer = document.querySelector(selectorWrapperTimer),
@@ -2926,10 +2846,10 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     function changePromoTimeAtPage(remainderTimeObj) {
-      daysBlock.textContent = getZero(remainderTimeObj.days);
-      hoursBlock.textContent = getZero(remainderTimeObj.hours);
-      minutesBlock.textContent = getZero(remainderTimeObj.minutes);
-      secondsBlock.textContent = getZero(remainderTimeObj.seconds);
+      daysBlock.textContent = Object(_universalFunctions__WEBPACK_IMPORTED_MODULE_0__["getZero"])(remainderTimeObj.days);
+      hoursBlock.textContent = Object(_universalFunctions__WEBPACK_IMPORTED_MODULE_0__["getZero"])(remainderTimeObj.hours);
+      minutesBlock.textContent = Object(_universalFunctions__WEBPACK_IMPORTED_MODULE_0__["getZero"])(remainderTimeObj.minutes);
+      secondsBlock.textContent = Object(_universalFunctions__WEBPACK_IMPORTED_MODULE_0__["getZero"])(remainderTimeObj.seconds);
     }
 
     function changeTxtContentUnderTime() {
@@ -2949,58 +2869,243 @@ window.addEventListener("DOMContentLoaded", () => {
         elementParentNum.childNodes[2].textContent = arrWordForms[2];
       }
     }
-  } // for modal
-
-
-  function openModal() {
-    modal.classList.add("modal_show");
-    document.body.style.overflow = "hidden";
-    clearInterval(modalTimerId);
   }
+}
 
-  function closeModal() {
-    document.querySelectorAll(".modal").forEach(modal => {
-      modal.classList.remove("modal_show");
+/* harmony default export */ __webpack_exports__["default"] = (countdown);
+
+/***/ }),
+
+/***/ "./src/js/modules/forms.js":
+/*!*********************************!*\
+  !*** ./src/js/modules/forms.js ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _modal__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./modal */ "./src/js/modules/modal.js");
+
+
+function forms(modalSelector) {
+  // forms
+  const forms = document.querySelectorAll("form"),
+        messages = {
+    loading: "icons/spinner.svg",
+    success: "Спасибо! Мы скоро с Вами свяжемся",
+    failure: "Что-то пошло не так..."
+  },
+        modal = document.querySelector(modalSelector);
+  forms.forEach(form => {
+    bindPostData(form);
+  });
+
+  const postData = async (url, data) => {
+    const result = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json"
+      },
+      body: data
     });
-    booleanOpenThanksModal = false;
-    document.body.style.overflow = "";
+    return await result.json();
+  };
+
+  function bindPostData(form) {
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const loadingSpinner = document.createElement("img");
+      loadingSpinner.src = messages.loading;
+      loadingSpinner.style.cssText = `
+                      display: block;
+                          margin: 0 auto;
+                  `;
+      form.insertAdjacentElement("afterend", loadingSpinner);
+      const formData = new FormData(form),
+            object = {};
+      formData.forEach((value, key) => {
+        object[key] = value;
+      });
+      const json = JSON.stringify(object);
+      postData('http://localhost:3000/requests', json).then(data => {
+        console.log(data);
+        loadingSpinner.remove();
+        form.reset();
+
+        if (modal.classList.contains("modal_show")) {
+          Object(_modal__WEBPACK_IMPORTED_MODULE_0__["closeModal"])(modalSelector);
+        }
+
+        Object(_modal__WEBPACK_IMPORTED_MODULE_0__["showThanksModal"])(messages.success, modalSelector);
+      }).catch(() => {
+        Object(_modal__WEBPACK_IMPORTED_MODULE_0__["showThanksModal"])(messages.failure, modalSelector);
+      });
+    });
   }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (forms);
+
+/***/ }),
+
+/***/ "./src/js/modules/modal.js":
+/*!*********************************!*\
+  !*** ./src/js/modules/modal.js ***!
+  \*********************************/
+/*! exports provided: default, openModal, closeModal, showThanksModal */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "openModal", function() { return openModal; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "closeModal", function() { return closeModal; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "showThanksModal", function() { return showThanksModal; });
+let booleanOpenThanksModal = false;
+const modalTimerId = setTimeout(() => openModal(".modal"), 20000);
+
+function openModal(modalSelector) {
+  const modal = document.querySelector(modalSelector);
+  modal.classList.add("modal_show");
+  document.body.style.overflow = "hidden";
+  clearInterval(modalTimerId);
+}
+
+function closeModal(modalSelector) {
+  document.querySelectorAll(modalSelector).forEach(modal => {
+    modal.classList.remove("modal_show");
+  });
+  booleanOpenThanksModal = false;
+  document.body.style.overflow = "";
+}
+
+function showThanksModal(str, modalSelector) {
+  const modal = document.querySelector(modalSelector);
+  booleanOpenThanksModal = true;
+  const modalThanks = document.createElement("div");
+  modalThanks.classList.add("modal", "modal_show");
+  modalThanks.innerHTML = `
+        <div class="modal__dialog">
+            <div class="modal__content">
+                <div data-modal-close class="modal__close">&times;</div>
+                <div class="modal__title">${str}</div>
+            </div>
+        </div>
+    `;
+  modal.insertAdjacentElement("afterend", modalThanks);
+  document.body.style.overflow = "hidden";
+  const timerIdCloseThanksModal = setTimeout(closeThanksModal, 4000);
+
+  function closeThanksModal() {
+    if (booleanOpenThanksModal) {
+      closeModal(modalSelector);
+    } else {
+      clearInterval(timerIdCloseThanksModal);
+    }
+  }
+}
+
+function modal(modalSelector, triggerSelector) {
+  const modal = document.querySelector(modalSelector),
+        modalShowElems = document.querySelectorAll(triggerSelector);
+  modalShowElems.forEach(showElemBtn => {
+    showElemBtn.addEventListener("click", () => openModal(modalSelector));
+  });
+  document.addEventListener("click", e => {
+    if (e.target == document.querySelector(".modal_show") || e.target.getAttribute("data-modal-close") == "") {
+      closeModal(modalSelector);
+    }
+  });
+  document.addEventListener("keydown", e => {
+    if (e.code == "Escape") {
+      closeModal(modalSelector);
+    }
+  });
+  window.addEventListener("scroll", showModalByScroll);
 
   function showModalByScroll() {
     if (window.scrollY + document.documentElement.clientHeight == document.documentElement.scrollHeight) {
-      openModal();
+      openModal(modalSelector);
       window.removeEventListener("scroll", showModalByScroll);
     }
   }
+}
 
-  function showThanksModal(str) {
-    const modalThanks = document.createElement("div");
-    modalThanks.classList.add("modal", "modal_show");
-    modalThanks.innerHTML = `
-			<div class="modal__dialog">
-				<div class="modal__content">
-					<div data-modal-close class="modal__close">&times;</div>
-					<div class="modal__title">${str}</div>
-				</div>
-			</div>
-		`;
-    modal.insertAdjacentElement("afterend", modalThanks);
-    document.body.style.overflow = "hidden";
-    const timerIdCloseThanksModal = setTimeout(closeThanksModal, 4000);
+/* harmony default export */ __webpack_exports__["default"] = (modal);
 
-    function closeThanksModal() {
-      if (booleanOpenThanksModal) {
-        closeModal();
-      } else {
-        clearInterval(timerIdCloseThanksModal);
-      }
+
+
+
+/***/ }),
+
+/***/ "./src/js/modules/slider.js":
+/*!**********************************!*\
+  !*** ./src/js/modules/slider.js ***!
+  \**********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _universalFunctions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./universalFunctions */ "./src/js/modules/universalFunctions.js");
+
+
+
+
+function slider() {
+  // slider
+  const sliderContentWrapper = document.querySelector(".offer__slider-wrapper"),
+        sliderNavsWrapper = document.querySelector(".offer__slider-counter"),
+        counterSliderTotal = sliderNavsWrapper.querySelector("#total"),
+        counterSliderCurrent = sliderNavsWrapper.querySelector("#current"),
+        prevSliderBtn = sliderNavsWrapper.querySelector(".offer__slider-prev"),
+        nextSliderBtn = sliderNavsWrapper.querySelector(".offer__slider-next"),
+        dotsNavWrapper = document.querySelector(".offer__slider-dots");
+  let indexCurrentSlider = 1,
+      sliderContentArr = [],
+      dotsNav = [],
+      width;
+  Object(_universalFunctions__WEBPACK_IMPORTED_MODULE_0__["getData"])("http://localhost:3000/imagesForSlider").then(dataArr => {
+    dataArr.forEach(contentSlider => {
+      const div = document.createElement("div");
+      div.classList.add("offer__slide");
+      div.innerHTML = `
+                    <img src="${contentSlider.imgUrl}" alt="${contentSlider.imgAlt}">
+                `;
+      sliderContentWrapper.append(div);
+    });
+  }).then(() => {
+    width = window.getComputedStyle(document.querySelector(".offer__slider-wrapper-long")).width;
+    sliderContentArr = sliderContentWrapper.querySelectorAll(".offer__slide"); // setIndexes(sliderContentArr); //для старой версии слайдера
+
+    sliderContentArr[indexCurrentSlider - 1].classList.add("offer__slide_active");
+    createNavsForSlider(dotsNavWrapper, dotsNav);
+    sliderContentWrapper.style.width = `calc( ${width} * ${sliderContentArr.length})`;
+    counterSliderCurrent.innerHTML = Object(_universalFunctions__WEBPACK_IMPORTED_MODULE_0__["getZero"])(indexCurrentSlider);
+    counterSliderTotal.innerHTML = Object(_universalFunctions__WEBPACK_IMPORTED_MODULE_0__["getZero"])(sliderContentArr.length);
+  });
+  nextSliderBtn.addEventListener("click", () => {
+    //меняет индекс и номер слайдера на странице
+    indexCurrentSlider = indexCurrentSlider == sliderContentArr.length ? 1 : indexCurrentSlider + 1;
+    changeContentSlider();
+  });
+  prevSliderBtn.addEventListener("click", e => {
+    //меняет индекс и номер слайдера на странице
+    indexCurrentSlider = indexCurrentSlider == 1 ? sliderContentArr.length : indexCurrentSlider - 1;
+    changeContentSlider();
+  });
+  dotsNavWrapper.addEventListener("click", e => {
+    const target = e.target;
+
+    if (target.classList.contains("offer__slider-dot") && !target.classList.contains("offer__slider-dot_active")) {
+      indexCurrentSlider = +target.dataset.index + 1;
+      changeContentSlider();
     }
-  } // for slider
-
+  });
 
   function changeContentSlider() {
     //смена номера текущего слайда и анимация на нужной dotNav
-    counterSliderCurrent.innerHTML = getZero(indexCurrentSlider);
+    counterSliderCurrent.innerHTML = Object(_universalFunctions__WEBPACK_IMPORTED_MODULE_0__["getZero"])(indexCurrentSlider);
     dotsNav.forEach(dot => {
       dot.classList.remove("offer__slider-dot_active");
 
@@ -3026,73 +3131,115 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     dotsNav[0].classList.add("offer__slider-dot_active");
-    setIndexes(dotsNav);
-  } // for calculating calorie allowance
+    Object(_universalFunctions__WEBPACK_IMPORTED_MODULE_0__["setIndexes"])(dotsNav);
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (slider);
+
+/***/ }),
+
+/***/ "./src/js/modules/tabs.js":
+/*!********************************!*\
+  !*** ./src/js/modules/tabs.js ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _universalFunctions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./universalFunctions */ "./src/js/modules/universalFunctions.js");
 
 
-  function getLocalStorageValues() {
-    inputGender = localStorage.getItem("inputGender") ? localStorage.getItem("inputGender") : inputGender;
-    inputActivity = localStorage.getItem("inputActivity") ? localStorage.getItem("inputActivity") : inputActivity;
-    heigthSm.value = localStorage.getItem("heigthSm.value") ? localStorage.getItem("heigthSm.value") : "";
-    weightKg.value = localStorage.getItem("weightKg.value") ? localStorage.getItem("weightKg.value") : "";
-    age.value = localStorage.getItem("age.value") ? localStorage.getItem("age.value") : "";
-    document.querySelectorAll(".calculating__choose-item_active").forEach(element => {
-      element.classList.remove("calculating__choose-item_active");
+function tabs() {
+  const tabs = document.querySelectorAll(".tabheader__item"),
+        tabsParent = document.querySelector(".tabheader__items"),
+        tabsContent = document.querySelectorAll(".tabcontent");
+  Object(_universalFunctions__WEBPACK_IMPORTED_MODULE_0__["setIndexes"])(tabs);
+  tabsParent.addEventListener("click", event => {
+    const clickedElement = event.target;
+    toggleTabContent(clickedElement);
+  });
+
+  function toggleTabContent(clickedElement) {
+    if (clickedElement && clickedElement.classList.contains("tabheader__item") && !clickedElement.classList.contains("tabheader__item_active")) {
+      hideTabsContent();
+      showTabsContent(clickedElement);
+    }
+  }
+
+  function hideTabsContent() {
+    tabs.forEach(tab => {
+      tab.classList.remove("tabheader__item_active");
     });
-    document.querySelector(`[data-gender="${inputGender}"]`).classList.add("calculating__choose-item_active");
-    document.querySelector(`#${inputActivity}`).classList.add("calculating__choose-item_active");
+    tabsContent.forEach(tabContent => {
+      tabContent.classList.remove("tabcontent_active", "fade");
+    });
   }
 
-  function setLocalStorageValues() {
-    localStorage.setItem("inputGender", inputGender);
-    localStorage.setItem("inputActivity", inputActivity);
-    localStorage.setItem("heigthSm.value", heigthSm.value);
-    localStorage.setItem("weightKg.value", weightKg.value);
-    localStorage.setItem("age.value", age.value);
+  function showTabsContent(tab) {
+    tab.classList.add("tabheader__item_active");
+    tabsContent[tab.dataset.index].classList.add("tabcontent_active", "fade");
   }
-}); // fetch('https://jsonplaceholder.typicode.com/posts', {
-// 	method: "POST",
-// 	body: JSON.stringify({name: "Alex", surname: "Peterson"}),
-// 	headers: {
-// 		"Content-type": "application/json"
-// 	}
-// })
-// 	.then(response => response.json())
-// 	.then(json => console.log(json));
-//////////////////////////////////////////////////////////	
-// проскроллен ли элемент до полной видимости
-// const previewBlock = document.querySelector(".tabcontent");
-// window.addEventListener('wheel', (e) => {
-// 	const posTop = previewBlock.getBoundingClientRect().top;
-// 	e.preventDefault();
-// 	if (posTop + previewBlock.clientHeight <= window.innerHeight && posTop > 0) {
-// 	}
-// });
-//////////////////////////////////////////////////////////
-// test horizontal wheel - do NOT work...
-// (function() {
-// 	function scrollHorizontally(e) {
-// 		e = window.event || e;
-// 		var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-// 		document.getElementById('statistic-table').scrollLeft -= (delta*10); // Multiplied by 10
-// 		e.preventDefault();
-// 	}
-// 	if (document.getElementById('statistic-table').addEventListener) {
-// 		// IE9, Chrome, Safari, Opera
-// 		document.getElementById('statistic-table').addEventListener("mousewheel", scrollHorizontally, false);
-// 		// Firefox
-// 		document.getElementById('statistic-table').addEventListener("DOMMouseScroll", scrollHorizontally, false);
-// 	} else {
-// 		// IE 6/7/8
-// 		document.getElementById('statistic-table').attachEvent("onmousewheel", scrollHorizontally);
-// 	}
-// })();
-// localStorage.setItem("number", 5);
-// localStorage.removeItem("number");
-// localStorage.clear();
-// console.log(localStorage.getItem("number"));
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (tabs);
+
+/***/ }),
+
+/***/ "./src/js/modules/universalFunctions.js":
+/*!**********************************************!*\
+  !*** ./src/js/modules/universalFunctions.js ***!
+  \**********************************************/
+/*! exports provided: setIndexes, getZero, deleteNotDigits, getData */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setIndexes", function() { return setIndexes; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getZero", function() { return getZero; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deleteNotDigits", function() { return deleteNotDigits; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getData", function() { return getData; });
+/* harmony import */ var core_js_modules_es_string_replace__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es.string.replace */ "./node_modules/core-js/modules/es.string.replace.js");
+/* harmony import */ var core_js_modules_es_string_replace__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_replace__WEBPACK_IMPORTED_MODULE_0__);
+
+
+//universal
+function setIndexes(elementsArr) {
+  //для сопоставления таба/слайда и контента
+  elementsArr.forEach((element, i) => {
+    element.dataset.index = i;
+  });
+}
+
+function getZero(num) {
+  if (num >= 0 && num < 10) {
+    return `0${num}`;
+  } else {
+    return num;
+  }
+}
+
+function deleteNotDigits(str) {
+  return str.replace(/\D/gi, "");
+}
+
+const getData = async url => {
+  const result = await fetch(url);
+
+  if (!result.ok) {
+    throw new Error(`Could not fetch ${url}, status: ${result.status}`);
+  }
+
+  return await result.json();
+};
+
+
+
+
+
 
 /***/ })
 
 /******/ });
-//# sourceMappingURL=script.js.map
+//# sourceMappingURL=bundle.js.map

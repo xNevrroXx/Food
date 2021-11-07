@@ -14,9 +14,14 @@ gulp.task("copy-html", () => {
                 .pipe(browsersync.stream());
 });
 gulp.task("copy-json", () => { 
-  return gulp.src("./src/js/*.json")
-.pipe(gulp.dest(dist + "/js"))
-.pipe(browsersync.stream());
+    return gulp.src("./src/js/*.json")
+                .pipe(gulp.dest(dist + "/js"))
+                .pipe(browsersync.stream());
+});
+gulp.task("copy-js", () => {
+  return gulp.src("./src/js/**/*.js")
+                .pipe(gulp.dest(dist + "/js"))
+                .pipe(browsersync.stream());
 });
 
 gulp.task("build-js", () => {
@@ -24,7 +29,7 @@ gulp.task("build-js", () => {
                 .pipe(webpack({
                     mode: 'development',
                     output: {
-                        filename: 'script.js'
+                        filename: 'bundle.js'
                     },
                     watch: false,
                     devtool: "source-map",
