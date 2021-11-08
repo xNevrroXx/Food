@@ -1,9 +1,9 @@
 import {closeModal, showThanksModal} from "./modal";
+import {postData} from "../services/services";
 
-
-function forms(modalSelector) {
+function forms(formSelector, modalSelector) {
     // forms
-    const forms = document.querySelectorAll("form"),
+    const forms = document.querySelectorAll(formSelector),
           messages = {
               loading: "icons/spinner.svg",
               success: "Спасибо! Мы скоро с Вами свяжемся",
@@ -14,18 +14,6 @@ function forms(modalSelector) {
     forms.forEach(form => {
         bindPostData(form);
     });
-
-    const postData = async (url, data) => {
-        const result = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json"
-            },
-            body: data
-        });
-
-        return await result.json();
-    };
 
     function bindPostData(form) {
         form.addEventListener("submit", e => {

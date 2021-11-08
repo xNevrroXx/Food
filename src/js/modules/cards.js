@@ -1,4 +1,4 @@
-import {getData} from "./universalFunctions";
+import {getData} from "../services/services";
 
 
 function cards() {// dynamic layout menu card
@@ -12,17 +12,17 @@ function cards() {// dynamic layout menu card
 			this.menuDescription = descriptionMenu;
 			this.priceAtDay = priceAtDay;
 			this.innerHtml = `
-			<div class="menu__item">
-				<img src="${urlToImageMenu}" alt="${altimg}">
-				<h3 class="menu__item-subtitle">${subtitleMenu}</h3>
-				<div class="menu__item-descr">${descriptionMenu}</div>
-				<div class="menu__item-divider"></div>
-				<div class="menu__item-price">
-					<div class="menu__item-cost">Цена:</div>
-					<div class="menu__item-total"><span>${priceAtDay}</span> руб/день</div>
+				<div class="menu__item">
+					<img src="${urlToImageMenu}" alt="${altimg}">
+					<h3 class="menu__item-subtitle">${subtitleMenu}</h3>
+					<div class="menu__item-descr">${descriptionMenu}</div>
+					<div class="menu__item-divider"></div>
+					<div class="menu__item-price">
+						<div class="menu__item-cost">Цена:</div>
+						<div class="menu__item-total"><span>${priceAtDay}</span> руб/день</div>
+					</div>
 				</div>
-			</div>
-		`;
+			`;
 		}
 	}
 

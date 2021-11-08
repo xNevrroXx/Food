@@ -1,4 +1,4 @@
-import {getData} from "./universalFunctions";
+import {getData} from "../services/services";
 import {getZero} from "./universalFunctions";
 import {setIndexes} from "./universalFunctions";
 

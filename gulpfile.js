@@ -18,11 +18,11 @@ gulp.task("copy-json", () => {
                 .pipe(gulp.dest(dist + "/js"))
                 .pipe(browsersync.stream());
 });
-gulp.task("copy-js", () => {
-  return gulp.src("./src/js/**/*.js")
-                .pipe(gulp.dest(dist + "/js"))
-                .pipe(browsersync.stream());
-});
+// gulp.task("copy-js", () => {
+//   return gulp.src("./src/js/**/*.js")
+//                 .pipe(gulp.dest(dist + "/js"))
+//                 .pipe(browsersync.stream());
+// });
 
 gulp.task("build-js", () => {
     return gulp.src("./src/js/main.js")

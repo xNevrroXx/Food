@@ -4,18 +4,23 @@ import cards from "./modules/cards";
 import countdown from "./modules/countdownTimer";
 import forms from "./modules/forms";
 import modal from "./modules/modal";
-import slider from "./modules/slider";
+import slider from "./modules/slider1.0";
 import tabs from "./modules/tabs";
+import {openModal} from "./modules/modal";
 
 window.addEventListener("DOMContentLoaded", () => {
+	const modalTimerId = setTimeout( () => openModal(".modal", modalTimerId), 20000);
+
 	tabs();
 	countdown();
 	cards();
-	modal(".modal", "[data-modal-show]");
-	forms(".modal");
-	slider();
+	modal(".modal", "[data-modal-show]", modalTimerId);
+	forms("form", ".modal");
+	slider(".slider");
 	calculatingCalorie();
 });
+
+
 
 
 

@@ -58,15 +58,7 @@ function calculatingCalorie() { // calculating calorieAllowance
     valueBodyWrapper.addEventListener("input", () => {
         const valueBody = [heigthSm, weightKg, age];
 
-        valueBody.forEach(element => {
-            if (element.value == "") {
-                element.style.border = "solid 2px red";
-            } else {
-                element.value = (deleteNotDigits(element.value));
-                element.style.border = "";
-            }
-        });
-
+        showBlankFields(valueBody);
         calculatingCalorieAllowance();
     });
 
@@ -104,6 +96,17 @@ function calculatingCalorie() { // calculating calorieAllowance
         } else {
             calculatingResult.textContent = "X";
         }
+    }
+
+    function showBlankFields(inputsArr) {
+        inputsArr.forEach(element => {
+            if (element.value == "") {
+                element.style.border = "solid 2px red";
+            } else {
+                element.value = (deleteNotDigits(element.value));
+                element.style.border = "";
+            }
+        });
     }
 
 	function getLocalStorageValues() {

@@ -1,20 +1,22 @@
 let booleanOpenThanksModal = false;
-const modalTimerId = setTimeout( () => openModal(".modal"), 20000);
 
-function openModal(modalSelector) {
+
+function openModal(modalSelector, modalTimerId) {
     const modal = document.querySelector(modalSelector);
 
     modal.classList.add("modal_show");
     document.body.style.overflow = "hidden";
-    clearInterval(modalTimerId);
+
+    if(modalTimerId) clearInterval(modalTimerId);
 }
 
 function closeModal(modalSelector) {
     document.querySelectorAll(modalSelector).forEach( modal => {
         modal.classList.remove("modal_show");
     });
-    booleanOpenThanksModal = false;
     document.body.style.overflow = "";
+
+    booleanOpenThanksModal = false;
 }
 
 function showThanksModal(str, modalSelector) {
@@ -37,31 +39,31 @@ function showThanksModal(str, modalSelector) {
 
     function closeThanksModal() {
         if (booleanOpenThanksModal) {
-            closeModal(modalSelector);
+            closeModal(modalSelector );
         } else {
             clearInterval(timerIdCloseThanksModal);
         }
     }
 }
 
-function modal(modalSelector, triggerSelector) {
+function modal(modalSelector, triggerSelector, modalTimerId) {
     const modal = document.querySelector(modalSelector),
           modalShowElems = document.querySelectorAll(triggerSelector);
         
 
     modalShowElems.forEach(showElemBtn => {
-        showElemBtn.addEventListener("click", () => openModal(modalSelector));
+        showElemBtn.addEventListener("click", () => openModal(modalSelector, modalTimerId));
     });
 
     document.addEventListener("click", (e) => {
         if (e.target == document.querySelector(".modal_show") || e.target.getAttribute("data-modal-close") == "") {
-            closeModal(modalSelector);
+            closeModal(modalSelector, booleanOpenThanksModal);
         }
     });
 
     document.addEventListener("keydown", (e) => {
         if ( e.code == "Escape") {
-            closeModal(modalSelector);
+            closeModal(modalSelector, booleanOpenThanksModal);
         }
     });
 
@@ -69,7 +71,7 @@ function modal(modalSelector, triggerSelector) {
 
 	function showModalByScroll() {
 		if (window.scrollY + document.documentElement.clientHeight == document.documentElement.scrollHeight) {
-			openModal(modalSelector);
+			openModal(modalSelector, modalTimerId);
 			window.removeEventListener("scroll", showModalByScroll);
 		}
 	}
