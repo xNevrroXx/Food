@@ -18,6 +18,18 @@ window.addEventListener("DOMContentLoaded", () => {
 	forms("form", ".modal");
 	slider(".slider");
 	calculatingCalorie();
+
+	// ".slider2".slider({
+	// 	carousel: true,
+	// 	numFirstSlider: 1,
+	// 	btnPrevSelector: ".buttonPrev",
+	// 	btnNextSelector: ".buttonNext",
+	// 	counter: true,
+	// 	navs: true,
+	// 	// slidesToShow: 1,
+	// 	// slidesToScroll: 1,
+	// 	// autoPlay: false
+	// });
 });
 
 
