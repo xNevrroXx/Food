@@ -17,6 +17,56 @@ function deleteNotDigits(str) {
     return str.replace(/\D/gi, "");
 }
 
+function toFloatNumber(str) {
+    return str.replace(/[^\d,.]/g, '');
+}
 export {setIndexes};
 export {getZero};
 export {deleteNotDigits};
+export {toFloatNumber};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

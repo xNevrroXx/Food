@@ -16,20 +16,22 @@ window.addEventListener("DOMContentLoaded", () => {
 	cards();
 	modal(".modal", "[data-modal-show]", modalTimerId);
 	forms("form", ".modal");
-	slider(".slider");
+	slider(".firstSlider");
 	calculatingCalorie();
 
-	// ".slider2".slider({
-	// 	carousel: true,
-	// 	numFirstSlider: 1,
-	// 	btnPrevSelector: ".buttonPrev",
-	// 	btnNextSelector: ".buttonNext",
-	// 	counter: true,
-	// 	navs: true,
-	// 	// slidesToShow: 1,
-	// 	// slidesToScroll: 1,
-	// 	// autoPlay: false
-	// });
+	".slider2".slider({
+		carousel: true,
+		numFirstSlide: 1,
+		btnPrevSelector: ".buttonPrev",
+		btnNextSelector: ".buttonNext",
+		counter: false,
+		navs: false,
+		widthContainerStr: "100%",
+		slidesToShow: 2,
+		slidesToScroll: 2,
+		autoplay: false,
+		// infinity: true
+	});
 });
 
 
