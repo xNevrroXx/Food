@@ -2,7 +2,7 @@ import {getZero} from "./universalFunctions";
 
 
 function countdown() { // countdown(обратный отсчет времени)
-	const endDatePromotion = '2022-01-01';
+	const endDatePromotion = '2022-05-17';
 	initCountdown(".promotion__timer", endDatePromotion);
 
     
@@ -27,7 +27,7 @@ function countdown() { // countdown(обратный отсчет времени
 		}
 
 		function getRemainderTimeObj(endDatePromotionStr) {
-			const remainderTimeMS = Date.parse(endDatePromotionStr) - new Date(),
+			const remainderTimeMS = Date.parse(endDatePromotionStr) - (1000 * 60 * 60 * 3) - new Date(),
 				days = Math.floor(remainderTimeMS / (1000 * 60 * 60 * 24)),
 				hours = Math.floor(remainderTimeMS / (1000 * 60 * 60) % 24),
 				minutes = Math.floor(remainderTimeMS / (1000 * 60) % 60),

@@ -14,8 +14,9 @@
     "last 2 ios versions"
   ],
   "devDependencies": {
-    "@babel/core": "^7.7.0",
-    "@babel/preset-env": "^7.7.1",
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
     "autoprefixer": "^9.7.1",
     "babel-loader": "^8.0.6",
     "browser-sync": "^2.27.7",
@@ -29,6 +30,7 @@
     "webpack-stream": "^5.2.1"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.12.1",
     "json-server": "^0.17.0"
   }
 }

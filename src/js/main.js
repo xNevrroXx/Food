@@ -25,10 +25,10 @@ window.addEventListener("DOMContentLoaded", () => {
 		btnPrevSelector: ".buttonPrev",
 		btnNextSelector: ".buttonNext",
 		counter: false,
-		navs: false,
+		navs: true,
 		widthContainerStr: "100%",
-		slidesToShow: 2,
-		slidesToScroll: 2,
+		slidesToShow: 1,
+		slidesToScroll: 1,
 		autoplay: false,
 		// infinity: true
 	});
