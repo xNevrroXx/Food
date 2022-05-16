@@ -9,7 +9,7 @@ String.prototype.slider = function(
     carousel = true, numFirstSlide = 1 , btnPrevSelector = "standartBtn", btnNextSelector = "standartBtn", infinity = false,
     navs = false, counter = true, widthContainerStr, slidesToShow = 1, slidesToScroll = 1, autoplay = false, autoplaySpeed = 2000} ) 
     { //function
-    let sliderContainer = document.querySelector(this);
+    const sliderContainer = document.querySelector(this);
     changeSelectorContainer(this);
     for(let i = 0; i < sliderContainer.children.length; i++) {
         sliderContainer.children[i].classList.add("slide");
@@ -41,11 +41,22 @@ String.prototype.slider = function(
             if(this == ".slider") {
                 throw new Error(`container class must not match ".slider"`);
             }
+        },
+        checkCustomBtns: () => {
+            if(btnPrevSelector != "standartBtn" && btnNextSelector != "standartBtn") {
+                const   
+                    btnNext = document.querySelector(`${this} ~ ${btnNextSelector}`),   
+                    btnPrev = document.querySelector(`${this} ~ ${btnPrevSelector}`);
+                
+                if(!(btnNext && btnPrev))
+                    throw new Error("There are no next/prev custom buttons elements. You should to create them.");
+            }
         }
     };
     throwErrorsObj.checkNumFirstSlide();
     throwErrorsObj.checkCounter();
     throwErrorsObj.checkSelectorContainer();
+    throwErrorsObj.checkCustomBtns();
     
     createWholeDOM(this);
     
@@ -316,9 +327,10 @@ String.prototype.slider = function(
             indexCurrentSlider = 1;
         } else { // Если есть возсожность пролистнуть хотя бы на 1 слайд вправо
             let counter = 0;
+            
             do {
                 counter++;
-            }while( (indexCurrentSlider + counter < (slidesContentArr.length-(slidesToShow-1))) 
+            } while( (indexCurrentSlider + counter < (slidesContentArr.length-(slidesToShow-1))) 
                     &&
                     (counter < slidesToScroll) );
 
@@ -354,25 +366,27 @@ String.prototype.slider = function(
 
 function firstSlider(containerSlider) {
     const sliderContentWrapper = document.querySelector(containerSlider);
+    
     getData("http://localhost:3000/imagesForSlider")
-    .then(dataArr => {
-        dataArr.forEach(contentSlider => {
-            const div = document.createElement("div");
+        .then(dataArr => {
+            console.log(dataArr);
+            dataArr.forEach(contentSlider => {
+                const div = document.createElement("div");
 
-            div.innerHTML = `
-                <img src="${contentSlider.imgUrl}" alt="${contentSlider.imgAlt}">
-            `;
-            sliderContentWrapper.insertAdjacentElement("beforeend", div);
+                div.innerHTML = `
+                    <img src="${contentSlider.imgUrl}" alt="${contentSlider.imgAlt}">
+                `;
+                sliderContentWrapper.insertAdjacentElement("beforeend", div);
+            });
+        })
+        .then(() => {
+            containerSlider.slider({
+                carousel: true,
+                navs: true, 
+                counter: true,
+                numFirstSlide: 1
+            });
         });
-    })
-    .then(() => {
-        containerSlider.slider({
-            carousel: true,
-            navs: true,
-            counter: true,
-            numFirstSlide: 3
-        });
-    });
 }
 
 
